@@ -117,8 +117,16 @@
               "devServerTarget": "OLC2Proyecto1:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {}
         }
       }
-    }},
-  "defaultProject": "OLC2Proyecto1"
+    }
+  },
+  "defaultProject": "OLC2Proyecto1",
+  "cli": {
+    "analytics": "2f7eeb86-12f1-498e-acad-737eaaafd80e"
+  }
 }
