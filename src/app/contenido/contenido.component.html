@@ -1,10 +1,11 @@
+<script type="text/javascript" src="analizador.js"></script>
 <div >         
     <form action="" id="form">
         <div class="jumbotron">
             <h4>Entrada </h4>    
-            <textarea class="form-control" id="entrada" name="entrada" rows="15" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+            <textarea class="form-control" #entrada rows="15" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
             <br>
-            <button type="button" onclick="analizar();"  class="btn btn-info">Analizar</button>
+            <button type="button"  (click) = "analizar(entrada.value)" class="btn btn-info">Analizar</button>
             <input type="file" id="btn_abrir" />
         </div>
     </form>       

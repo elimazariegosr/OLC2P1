@@ -3,15 +3,15 @@
 %{
     
 
-    import {Nodo} from './Nodo_AST.js';
     var temp = "";
     var funciones = new Array();
-    /*function Nodo(nombre, tipo,hijos){
+    function Nodo(nombre, tipo,hijos){
         this.nombre = nombre;
         this.tipo = tipo;
         this.hijos = hijos;
 
-    }*/
+    }
+   
     function Funcion(nombre,tipo, contenido){
         this.nombre = nombre;
         this.contenido = contenido;
