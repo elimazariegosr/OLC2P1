@@ -9,7 +9,7 @@ export class ContenidoComponent implements OnInit {
   constructor() { }
 
   
-  analizar(entrada:string):void{
+  traducir(entrada:string):void{
     console.log(entrada);
   }
   ngOnInit(): void {
