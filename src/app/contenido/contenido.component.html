@@ -1,19 +1,37 @@
 <script type="text/javascript" src="analizador.js"></script>
-<div >         
     <form action="" id="form">
         <div class="jumbotron">
-            <h4>Entrada </h4>    
-            <textarea class="form-control" #entrada rows="15" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
-            <br>
-            <button type="button"  (click) = "traducir(entrada.value)" class="btn btn-info">Traducir</button>
-            <input type="file" id="btn_abrir" />
-        </div>
+            <table class="table">
+                <tr>
+                    <td>
+                        <h4>Entrada </h4>
+                    </td>
+                    <td>
+                        <h4>Consola</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea class="form-control" #entrada rows="12" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+                    </td>
+                    <td>
+                        <textarea class="form-control" id="txt_consola" readonly name="txt_consola" rows="12" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>
+                                    <button type="button"  (click) = "traducir(entrada.value)" class="btn btn-info">Traducir</button>
+                                </td>
+                                <td>
+                                    <button type="button"  (click) = "traducir(entrada.value)" class="btn btn-info">Traducir</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>         
     </form>       
-    <div class="jumbotron"> 
-        <h4>Codigo 3 direcciones</h4>
-   
-      <textarea class="form-control" id="txt_consolapy" readonly name="txt_consolapy" rows="5" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
-      <button type="button" class="btn btn-danger" id="btn_py">Ocultar</button>
-      <a class="btn btn-danger" id="btn_guardar_py">Guardar PY</a>
-    </div>
-</div>

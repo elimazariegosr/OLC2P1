@@ -72,54 +72,54 @@
   }
 */
 var analizador = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,5],$V1=[5,8,9,15,17],$V2=[1,26],$V3=[1,25],$V4=[8,9,15,17];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,5],$V1=[5,8],$V2=[1,12],$V3=[1,14];
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"INIT":3,"RAIZ":4,"EOF":5,"FUNCIONES":6,"FUNCION":7,"TK_FUNCTION":8,"TK_ID":9,"TK_P_ABRE":10,"TK_P_CIERRA":11,"TK_DOS_PUNTOS":12,"TIPO_FUNCION":13,"TK_LL_ABRE":14,"TK_LL_CIERRA":15,"CONT_FUNCION":16,"TK_NUMBER":17,"TK_STRING":18,"TK_VOID":19,"TK_BOOLEAN":20,"TK_ANY":21,"LIST_CONT_FUNCIONES":22,"SENTENCIAS":23,"CONT_SENTENCIAS":24,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",8:"TK_FUNCTION",9:"TK_ID",10:"TK_P_ABRE",11:"TK_P_CIERRA",12:"TK_DOS_PUNTOS",14:"TK_LL_ABRE",15:"TK_LL_CIERRA",17:"TK_NUMBER",18:"TK_STRING",19:"TK_VOID",20:"TK_BOOLEAN",21:"TK_ANY"},
-productions_: [0,[3,2],[4,1],[7,8],[7,9],[13,1],[13,1],[13,1],[13,1],[13,1],[16,2],[16,1],[22,1],[22,1],[6,2],[6,1],[23,2],[23,1],[24,1],[24,1]],
+symbols_: {"error":2,"INIT":3,"RAIZ":4,"EOF":5,"CONT_RAIZ":6,"IMPRIMIR":7,"TK_CONSOLE":8,"TK_PUNTO":9,"TK_LOG":10,"TK_P_ABRE":11,"EXPRESION":12,"TK_P_CIERRA":13,"TK_P_COMA":14,"TIPO":15,"TK_NUMBER":16,"TK_STRING":17,"TK_VOID":18,"TK_BOOLEAN":19,"TK_ANY":20,"TK_MAS":21,"TK_CADENA":22,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",8:"TK_CONSOLE",9:"TK_PUNTO",10:"TK_LOG",11:"TK_P_ABRE",13:"TK_P_CIERRA",14:"TK_P_COMA",16:"TK_NUMBER",17:"TK_STRING",18:"TK_VOID",19:"TK_BOOLEAN",20:"TK_ANY",21:"TK_MAS",22:"TK_CADENA"},
+productions_: [0,[3,2],[4,2],[4,1],[6,1],[7,7],[15,1],[15,1],[15,1],[15,1],[15,1],[12,3],[12,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
-console.log($$[$0-1]);
+this.$ = new Arbol($$[$0-1]); return this.$;
 break;
 case 2:
-this.$ = new Nodo("Raiz","Raiz",$$[$0]); recorrer_arbol(this.$,""); recorrer_funciones();
+ this.$ = $$[$0-1]; this.$.push($$[$0]);
 break;
 case 3:
-this.$ = new Nodo($$[$0-6], "Funcion",[]);
+this.$ = [$$[$0]];
 break;
 case 4:
-this.$ = new Nodo($$[$0-7],"Funcion",$$[$0-1]);
-break;
-case 10:
-this.$ = $$[$0-1]; this.$.push(new Nodo("Contenido", "Contenido" , $$[$0]));
-break;
-case 11:
-this.$ = []; this.$.push(new Nodo("Contenido","Contenido" , $$[$0]));
-break;
-case 12: case 13:
 this.$ = $$[$0];
 break;
-case 14: case 16:
-this.$ = $$[$0-1]; this.$.push($$[$0]);
+case 5:
+this.$ = new Imprimir($$[$0-2], 0, 0);
 break;
-case 15: case 17:
-this.$ = []; this.$.push($$[$0]);
+case 6:
+ this.$ = new Tipo(tipos.NUMBER);
 break;
-case 18:
-this.$ = new Nodo($$[$0], "Number", []);
+case 7:
+ this.$ = new Tipo(tipos.STRING);
 break;
-case 19:
-this.$ = new Nodo($$[$0],"ID", []);
+case 8:
+ this.$ = new Tipo(tipos.VOID);
+break;
+case 9:
+ this.$ = new Tipo(tipos.BOOLEAN);
+break;
+case 10:
+ this.$ = new Tipo(tipos.ANY);
+break;
+case 12:
+this.$ = new Primitivo(new Tipo(tipos.STRING), $$[$0].replace(/\"/g,"").replace(/\'/g,""),0,0);
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:4,8:$V0},{1:[3]},{5:[1,6]},{5:[2,2],7:7,8:$V0},o($V1,[2,15]),{9:[1,8]},{1:[2,1]},o($V1,[2,14]),{10:[1,9]},{11:[1,10]},{12:[1,11]},{13:12,17:[1,13],18:[1,14],19:[1,15],20:[1,16],21:[1,17]},{14:[1,18]},{14:[2,5]},{14:[2,6]},{14:[2,7]},{14:[2,8]},{14:[2,9]},{6:22,7:4,8:$V0,9:$V2,15:[1,19],16:20,17:$V3,22:21,23:23,24:24},o($V1,[2,3]),{6:22,7:4,8:$V0,9:$V2,15:[1,27],17:$V3,22:28,23:23,24:24},o($V4,[2,11]),o([9,15,17],[2,12],{7:7,8:$V0}),o([8,15],[2,13],{24:29,9:$V2,17:$V3}),o($V4,[2,17]),o($V4,[2,18]),o($V4,[2,19]),o($V1,[2,4]),o($V4,[2,10]),o($V4,[2,16])],
-defaultActions: {6:[2,1],13:[2,5],14:[2,6],15:[2,7],16:[2,8],17:[2,9]},
+table: [{3:1,4:2,6:3,7:4,8:$V0},{1:[3]},{5:[1,6],6:7,7:4,8:$V0},o($V1,[2,3]),o($V1,[2,4]),{9:[1,8]},{1:[2,1]},o($V1,[2,2]),{10:[1,9]},{11:[1,10]},{12:11,22:$V2},{13:[1,13],21:$V3},o([13,21],[2,12]),{14:[1,15]},{12:16,22:$V2},o($V1,[2,5]),{13:[2,11],21:$V3}],
+defaultActions: {6:[2,1]},
 parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -267,59 +267,10 @@ parse: function parse(input) {
     return true;
 }};
 
-    
-
-    var temp = "";
-    var funciones = new Array();
-    function Nodo(nombre, tipo,hijos){
-        this.nombre = nombre;
-        this.tipo = tipo;
-        this.hijos = hijos;
-
-    }
-    function Funcion(nombre,tipo, contenido){
-        this.nombre = nombre;
-        this.contenido = contenido;
-        this.tipo = tipo;
-    }
-
-    function agregar_funcion(nombre, tipo, contenido){
-        var agregado = 0;
-        for(i in funciones){
-            if(funciones[i].nombre == nombre){
-                funciones[i].contenido += "\n" + contenido;
-                agregado = 1; 
-            }
-        }
-        if(agregado == 0){
-            funciones.push(new Funcion(nombre,tipo,contenido));
-        }
-    }
-    function recorrer_funciones(){
-        for(i in funciones){
-            console.log("function " + funciones[i].nombre + "():void{ \n" + funciones[i].contenido + "\n}");
-        }      
-    }
-
-    function recorrer_arbol(tmp, padre){
-         if(tmp != null){
-            var hijos = new Array();
-            hijos = tmp.hijos;
-            if(tmp.tipo == "Funcion"){
-                if(padre != ""){
-                    padre += "_" + tmp.nombre;
-                }else{
-                    padre = tmp.nombre;
-                }
-                agregar_funcion(padre,tmp.tipo,"");
-            }else if(tmp.tipo != "Raiz" && tmp.tipo != "Contenido"){
-                agregar_funcion(padre,"",tmp.nombre);
-            }
-            for(i in hijos){
-                recorrer_arbol(hijos[i], padre);
-            }
-         }   
-    }
+    const {Imprimir} = require('./Instrucciones/Imprimir');
+    const {Tipo, tipos} = require('./AST/Tipo'); 
+    const {Arbol} = require('./AST/Arbol'); 
+    const {Primitivo} = require('./Expresiones/Primitivo');
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
@@ -658,13 +609,13 @@ case 3:/* skip comment content*/
 break;
 case 4:/* skip whitespace */
 break;
-case 5:return 18;
+case 5:return 17;
 break;
-case 6:return 17;
+case 6:return 16;
 break;
-case 7:return 20;
+case 7:return 19;
 break;
-case 8:return 19;
+case 8:return 18;
 break;
 case 9:return 'TK_VAR';
 break;
@@ -672,7 +623,7 @@ case 10:return 'TK_LET';
 break;
 case 11:return 'TK_CONST';
 break;
-case 12:return 21;
+case 12:return 20;
 break;
 case 13:return 'TK_ARRAY';
 break;
@@ -708,23 +659,23 @@ case 28:return 'TK_CONTINUE';
 break;
 case 29:return 'TK_RETURN';
 break;
-case 30:return 8;
+case 30:return 'TK_FUNCTION';
 break;
-case 31:return 'TK_CONSOLE';
+case 31:return 8;
 break;
-case 32:return 'TK_LOG';
+case 32:return 10;
 break;
 case 33:return 'TK_TRUE';
 break;
 case 34:return 'TK_FALSE';
 break;
-case 35:return 14; 
+case 35:return 'TK_LL_ABRE'; 
 break;
-case 36:return 15;
+case 36:return 'TK_LL_CIERRA';
 break;
-case 37:return 10;
+case 37:return 11;
 break;
-case 38:return 11;
+case 38:return 13;
 break;
 case 39:return 'TK_C_ABRE';
 break;
@@ -734,9 +685,9 @@ case 41:return 'TK_COMA';
 break;
 case 42:return 'TK_INTERROGACION';
 break;
-case 43:return 12;
+case 43:return 'TK_DOS_PUNTOS';
 break;
-case 44:return 'TK_P_COMA';
+case 44:return 14;
 break;
 case 45:return 'TK_MENOR_IGUAL';
 break;
@@ -770,7 +721,7 @@ case 59:return 'TK_MOD_IGUAL';
 break;
 case 60:return 'TK_MAS_MAS';
 break;
-case 61:return 'TK_MAS';
+case 61:return 21;
 break;
 case 62:return 'TK_MENOS_MENOS';
 break;
@@ -784,23 +735,23 @@ case 66:return 'TK_MOD';
 break;
 case 67:return 'TK_ELEVADO';
 break;
-case 68:return 'TK_PUNTO';
+case 68:return 9;
 break;
 case 69:return 'TK_NULO';
 break;
-case 70:return 9; /* Varying form */
+case 70:return 'TK_ID'; /* Varying form */
 break;
 case 71:return 'TK_NUMERO';
 break;
 case 72:return 'TK_NUMERO';
 break;
-case 73:return 'TK_CADENA';
+case 73:return 22;
 break;
-case 74:return 'TK_CADENA';
+case 74:return 22;
 break;
-case 75:return 'TK_CADENA';
+case 75:return 22;
 break;
-case 76:return 'TK_CADENA';
+case 76:return 22;
 break;
 case 77:return 5;
 break;

@@ -9,6 +9,13 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  },
+  
   "private": true,
   "dependencies": {
     "@angular/animations": "~10.1.0",

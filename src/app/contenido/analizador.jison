@@ -1,60 +1,10 @@
 
 /* description: Parses end executes mathematical expressions. */
 %{
-    
-
-    var temp = "";
-    var funciones = new Array();
-    function Nodo(nombre, tipo,hijos){
-        this.nombre = nombre;
-        this.tipo = tipo;
-        this.hijos = hijos;
-
-    }
-   
-    function Funcion(nombre,tipo, contenido){
-        this.nombre = nombre;
-        this.contenido = contenido;
-        this.tipo = tipo;
-    }
-
-    function agregar_funcion(nombre, tipo, contenido){
-        var agregado = 0;
-        for(i in funciones){
-            if(funciones[i].nombre == nombre){
-                funciones[i].contenido += "\n" + contenido;
-                agregado = 1; 
-            }
-        }
-        if(agregado == 0){
-            funciones.push(new Funcion(nombre,tipo,contenido));
-        }
-    }
-    function recorrer_funciones(){
-        for(i in funciones){
-            console.log("function " + funciones[i].nombre + "():void{ \n" + funciones[i].contenido + "\n}");
-        }      
-    }
-
-    function recorrer_arbol(tmp, padre){
-         if(tmp != null){
-            var hijos = new Array();
-            hijos = tmp.hijos;
-            if(tmp.tipo == "Funcion"){
-                if(padre != ""){
-                    padre += "_" + tmp.nombre;
-                }else{
-                    padre = tmp.nombre;
-                }
-                agregar_funcion(padre,tmp.tipo,"");
-            }else if(tmp.tipo != "Raiz" && tmp.tipo != "Contenido"){
-                agregar_funcion(padre,"",tmp.nombre);
-            }
-            for(i in hijos){
-                recorrer_arbol(hijos[i], padre);
-            }
-         }   
-    }
+    const {Imprimir} = require('./Instrucciones/Imprimir');
+    const {Tipo, tipos} = require('./AST/Tipo'); 
+    const {Arbol} = require('./AST/Arbol'); 
+    const {Primitivo} = require('./Expresiones/Primitivo');
 %}
 
 /* lexical grammar */
@@ -185,40 +135,27 @@ BSL               "\\".
 
 %% /* language grammar */
 
-INIT    :   RAIZ EOF {console.log($1);};
-
-RAIZ    :   FUNCIONES {$$ = new Nodo("Raiz","Raiz",$1); recorrer_arbol($$,""); recorrer_funciones();};   
-
-FUNCION     :   TK_FUNCTION TK_ID TK_P_ABRE TK_P_CIERRA TK_DOS_PUNTOS TIPO_FUNCION
-                TK_LL_ABRE  TK_LL_CIERRA {$$ = new Nodo($2, "Funcion",[]);}
-            |   TK_FUNCTION TK_ID TK_P_ABRE TK_P_CIERRA TK_DOS_PUNTOS TIPO_FUNCION 
-                TK_LL_ABRE CONT_FUNCION  TK_LL_CIERRA {$$ = new Nodo($2,"Funcion",$8);} 
+INIT    :   RAIZ EOF {$$ = new Arbol($1); return $$;}
 ;
 
-TIPO_FUNCION:   TK_NUMBER
-            |   TK_STRING
-            |   TK_VOID
-            |   TK_BOOLEAN
-            |   TK_ANY
+RAIZ    :   RAIZ CONT_RAIZ { $$ = $1; $$.push($2);}
+        |   CONT_RAIZ {$$ = [$1];}   
 ;
 
-CONT_FUNCION    :   CONT_FUNCION LIST_CONT_FUNCIONES {$$ = $1; $$.push(new Nodo("Contenido", "Contenido" , $2));}
-                |   LIST_CONT_FUNCIONES {$$ = []; $$.push(new Nodo("Contenido","Contenido" , $1));}
+CONT_RAIZ   :   IMPRIMIR {$$ = $1;}
 ;
 
-LIST_CONT_FUNCIONES   :   FUNCIONES {$$ = $1;}
-                      |   SENTENCIAS {$$ = $1;}
+IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG TK_P_ABRE EXPRESION TK_P_CIERRA TK_P_COMA
+                {$$ = new Imprimir($5, 0, 0);}
+;   
+
+TIPO    :   TK_NUMBER   { $$ = new Tipo(tipos.NUMBER);}
+        |   TK_STRING   { $$ = new Tipo(tipos.STRING);}
+        |   TK_VOID     { $$ = new Tipo(tipos.VOID);}
+        |   TK_BOOLEAN  { $$ = new Tipo(tipos.BOOLEAN);}
+        |   TK_ANY      { $$ = new Tipo(tipos.ANY);}
 ;
 
-
-FUNCIONES   :   FUNCIONES FUNCION {$$ = $1; $$.push($2);}
-            |   FUNCION {$$ = []; $$.push($1);}
-;
-
-SENTENCIAS  :   SENTENCIAS  CONT_SENTENCIAS {$$ = $1; $$.push($2);}
-            |   CONT_SENTENCIAS {$$ = []; $$.push($1);}
-;
-
-CONT_SENTENCIAS :   TK_NUMBER {$$ = new Nodo($1, "Number", []);}
-                |   TK_ID {$$ = new Nodo($1,"ID", []);}
-;       
+EXPRESION   :   EXPRESION TK_MAS EXPRESION   
+            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),0,0);}
+;   
