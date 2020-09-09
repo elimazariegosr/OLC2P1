@@ -27,7 +27,11 @@ export class ContenidoComponent implements OnInit {
     });
     console.log(arbol);
     console.log(arbol.consola);
-    document.getElementById('txt_consola').innerHTML = "HOLAMUNDO";
+    let salida = "";
+    arbol.consola.forEach(element => {
+      salida += element + "\n";
+    });
+    document.getElementById('txt_consola').innerHTML = salida;  
   }
   ngOnInit(): void {
     
