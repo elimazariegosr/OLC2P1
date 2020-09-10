@@ -5,6 +5,9 @@
     const {Tipo, tipos} = require('./AST/Tipo'); 
     const {Arbol} = require('./AST/Arbol'); 
     const {Primitivo} = require('./Expresiones/Primitivo');
+    const {Aritmetica} = require('./Expresiones/Aritmetica');
+    const {Identificador} = require('./Instrucciones/Identificador');
+    const {Declaracion} = require('./Instrucciones/Declaracion');
 %}
 
 /* lexical grammar */
@@ -93,7 +96,7 @@ BSL               "\\".
 "&&"                  return 'TK_AND';
 "!"                   return 'TK_NOT';
 
-"="                   return 'TK_TK_IGUAL';
+"="                   return 'TK_IGUAL';
 "+="                  return 'TK_MAS_IGUAL';
 "-="                  return 'TK_MENOS_IGUAL';
 "*="                  return 'TK_MULTI_IGUAL';
@@ -118,7 +121,7 @@ BSL               "\\".
 {Ds}          				return 'TK_NUMERO';
 "\"\""                return 'TK_CADENA';
 "\""([^"]|{BSL})*"\"" return 'TK_CADENA';
-['][']                return 'TK_CADENA';
+"\'\'"                return 'TK_CADENA';
 "\'"([^']|{BSL})*"\'" return 'TK_CADENA';
 
 <<EOF>>               return 'EOF';
@@ -143,7 +146,12 @@ RAIZ    :   RAIZ CONT_RAIZ { $$ = $1; $$.push($2);}
 ;
 
 CONT_RAIZ   :   IMPRIMIR {$$ = $1;}
+            |   DECLARACION_VARIABLE {$$ = $1;}    
 ;
+
+DECLARACION_VARIABLE    :     TK_LET TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION TK_P_COMA        
+        {$$ = new Declaracion($4, $2, $6, _$.first_line, _$.first_column);}
+;   
 
 IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG TK_P_ABRE EXPRESION TK_P_CIERRA TK_P_COMA
                 {$$ = new Imprimir($5, 0, 0);}
@@ -156,6 +164,14 @@ TIPO    :   TK_NUMBER   { $$ = new Tipo(tipos.NUMBER);}
         |   TK_ANY      { $$ = new Tipo(tipos.ANY);}
 ;
 
-EXPRESION   :   EXPRESION TK_MAS EXPRESION   
-            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),0,0);}
+EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}
+            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
+            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
+            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
+            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),_$.first_line, _$.first_column);}
+            |   TK_NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),_$.first_line, _$.first_column);}        
+            |   TK_ID       { $$ = new Identificador($1, _$.first_line, _$.first_column); }         
 ;   
+
+
+

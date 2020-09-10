@@ -14,7 +14,7 @@ class Imprimir extends Nodo{
     }
     
     ejecutar(tabla: Tabla, arbol: Arbol): any {
-        const value = this.expresion.ejecutar(tabla, arbol);
+        const value =  this.expresion.ejecutar(tabla, arbol);
         arbol.consola.push(value);
         return null;
     }
