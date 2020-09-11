@@ -5,7 +5,7 @@ function generateTree(treeData) {
     // ************** Generate the tree diagram	 *****************
     var margin = { top: 20, right: 00, bottom: 20, left: 0 },
         width = 70 * size - margin.right - margin.left,
-        height = 60 * size - margin.top - margin.bottom;
+        height = 70 * size - margin.top - margin.bottom;
 
     var i = 0,
         duration = 750,

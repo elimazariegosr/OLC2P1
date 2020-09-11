@@ -1,6 +1,6 @@
 .node circle {
     fill: #fff;
-    stroke: steelblue;
+    stroke: green;
     stroke-width: 3px;
 }
 
@@ -10,6 +10,6 @@
 
 .link {
     fill: none;
-    stroke: #ccc;
+    stroke: red;
     stroke-width: 2px;
 }

@@ -10,5 +10,8 @@ class Errror{
         this.linea = linea;
         this.columna = columna;
     }
+    toString():string{
+        return "Error, tipo: " + this.tipo + ", descripcion: " + this.desc;
+    }
 }
 export {Errror};

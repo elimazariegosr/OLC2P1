@@ -6,8 +6,23 @@
     const {Arbol} = require('./AST/Arbol'); 
     const {Primitivo} = require('./Expresiones/Primitivo');
     const {Aritmetica} = require('./Expresiones/Aritmetica');
+    const {Relacional} = require('./Expresiones/Relacional');
     const {Identificador} = require('./Instrucciones/Identificador');
     const {Declaracion} = require('./Instrucciones/Declaracion');
+    const {Asignacion} = require('./Instrucciones/Asignacion');
+    const {If} = require('./Instrucciones/If');
+
+    function agregar_vars(arreglo, lista){
+        if(arreglo[0] != ""){
+                arreglo[1].forEach(element => {
+                        element.tipo_declaracion = arreglo[0];
+                        lista.push(element);
+                });
+        }else{
+                lista.push(arreglo[1]);
+        }
+        return lista;
+    }
 %}
 
 /* lexical grammar */
@@ -138,20 +153,58 @@ BSL               "\\".
 
 %% /* language grammar */
 
-INIT    :   RAIZ EOF {$$ = new Arbol($1); return $$;}
+/*INICIO DE GRAMATICA*/
+INIT    :   SENTENCIAS EOF {$$ = new Arbol($1); console.log($1); return $$;}
 ;
 
-RAIZ    :   RAIZ CONT_RAIZ { $$ = $1; $$.push($2);}
-        |   CONT_RAIZ {$$ = [$1];}   
+/******************************************* RAIZ *********************************************************/
+SENTENCIAS    :   SENTENCIAS CONT_SENTENCIAS { $$ = $1; $$ = agregar_vars($2, $$);}
+              |   CONT_SENTENCIAS {$$ = []; $$ = agregar_vars($1, $$);}   
 ;
 
-CONT_RAIZ   :   IMPRIMIR {$$ = $1;}
-            |   DECLARACION_VARIABLE {$$ = $1;}    
+/******************************************* CONTENIDO RAIZ **********************************************/
+CONT_SENTENCIAS   :   IMPRIMIR {$$ = ["",$1];}
+                  |   DECLARACION_VARIABLE {$$ = $1;}
+                  |   ASiGNACION_VARIABLE {$$ = ["",$1];}  
+                  |   SENTENCIA_IF {$$ = ["",$1];}        
+;
+/******************************************* FIN RAIZ ****************************************************/
+
+/******************************************* DECLARACION VAR *********************************************/
+DECLARACION_VARIABLE    :     TIPO_DECLARACION LISTA_DECLARACION TK_P_COMA {$$ = [$1,$2];}
 ;
 
-DECLARACION_VARIABLE    :     TK_LET TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION TK_P_COMA        
-        {$$ = new Declaracion($4, $2, $6, _$.first_line, _$.first_column);}
-;   
+LISTA_DECLARACION     :     LISTA_DECLARACION TK_COMA DECLARACION { $$ = $1; $$.push($3);}
+                      |     DECLARACION {$$ = [$1];}
+;
+
+DECLARACION     :     TK_ID{ $$ = new Declaracion(null, $1, null, 0,0);}
+                |     TK_ID TK_IGUAL EXPRESION { $$ = new Declaracion(null, $1, $3, 0,0);}
+                |     TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion($3, $1, null,0,0);}
+                |     TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION { $$ = new Declaracion($3, $1, $5,0,0);}
+;          
+
+TIPO_DECLARACION    :   TK_LET  {$$ = $1;}
+                    |   TK_CONST {$$ = $1;}
+;  
+/******************************************* FIN DECLARACION VAR *****************************************/
+
+/******************************************* ASGNACION VAR ***********************************************/
+ASiGNACION_VARIABLE     :     TK_ID TK_IGUAL EXPRESION TK_P_COMA {$$ = new Asignacion($1,$3,0,0);}
+;
+/******************************************* FIN ASIGNACION VAR ******************************************/
+
+SENTENCIA_IF    :    TK_IF CONDICIONAL CONT_CONTROL{$$ = new If($2, $3, [],0,0);}
+                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE CONT_CONTROL {$$ = new If($2, $3, $5,0,0);}
+                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE IF{$$ = new If($2, $3, [$5],0,0);}
+;
+
+CONDICIONAL   :   TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}
+;
+
+CONT_CONTROL   :   TK_LL_ABRE SENTENCIAS TK_LL_CIERRA {$$ = $2;}
+               |   TK_LL_ABRE TK_LL_CIERRA {$$ = [];}
+;
 
 IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG TK_P_ABRE EXPRESION TK_P_CIERRA TK_P_COMA
                 {$$ = new Imprimir($5, 0, 0);}
@@ -168,6 +221,12 @@ EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.firs
             |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
             |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
             |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
+            |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}                
+            |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
+            |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
+            |   EXPRESION TK_MENOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
+            |   EXPRESION TK_IGUAL_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
+            |   EXPRESION TK_DISTINTO EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}              
             |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),_$.first_line, _$.first_column);}
             |   TK_NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),_$.first_line, _$.first_column);}        
             |   TK_ID       { $$ = new Identificador($1, _$.first_line, _$.first_column); }         
