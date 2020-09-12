@@ -11,6 +11,8 @@ abstract class Nodo{
 
     abstract ejecutar(tabla: Tabla, arbol: Arbol): any;
 
+    abstract get_tipo():any;
+    
     constructor(tipo: Tipo, linea: number, columna: number) {
         this.tipo = tipo;
         this.linea = linea;

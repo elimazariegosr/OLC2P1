@@ -11,6 +11,9 @@ class Primitivo extends Nodo{
         this.valor = valor;
     }
 
+    get_tipo(){
+        return this.tipo;
+    }
     ejecutar(tabla: Tabla, arbol: Arbol) {
         return this.valor;
     }

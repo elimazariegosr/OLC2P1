@@ -9,5 +9,8 @@ class Continue extends Nodo {
     ejecutar(tabla: Tabla, arbol: Arbol){
         return this;
     }
+    get_tipo(){
+        
+    }
 }
 export {Continue};

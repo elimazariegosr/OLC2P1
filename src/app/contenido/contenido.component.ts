@@ -6,12 +6,17 @@ import {Asignacion} from './Instrucciones/Asignacion';
 import {Identificador} from './Instrucciones/Identificador';
 import {Declaracion} from './Instrucciones/Declaracion';
 import {If} from './Instrucciones/If';
+import {While} from './Instrucciones/While';
+import {Funcion} from './Instrucciones/Funcion';
+import {Llamada_funcion} from './Instrucciones/Llamada_funcion';
 
 import {Primitivo} from './Expresiones/Primitivo';
 import {Aritmetica} from './Expresiones/Aritmetica';
 import {Relacional} from './Expresiones/Relacional';
+import {Logica} from './Expresiones/Logica';
 import {Break} from './Expresiones/Break';
 import {Continue} from './Expresiones/Continue';
+import {Return} from './Expresiones/Return';
 import { Errror } from './AST/Errror';
 import { Nodo_AST } from './AST/Nodo_AST';
 import { Nodo } from './AST/Nodo';
@@ -39,7 +44,11 @@ export class ContenidoComponent implements OnInit {
     }
     this.arbol = parser.parse(entrada);
     this.arbol.instrucciones.map((m: any) =>{
-      const res = m.ejecutar(this.tabla, this.arbol);
+      if(m instanceof Funcion){
+          m.guardar_funcion(this.tabla, this.arbol);
+      }else{
+        const res = m.ejecutar(this.tabla, this.arbol);
+      }
     });
     let salida = "";
     this.arbol.consola.forEach(element => {
@@ -72,6 +81,9 @@ export class ContenidoComponent implements OnInit {
         }else if(element instanceof Asignacion){
           padre.name = "Asignacion " + element.id;
           hijo = this.ast(element.valor);
+        }else if(element instanceof If){
+          padre.name = "If";
+          hijo = this.ast(element);
         }  
         if(padre.name != ""){
           hijo.parent = padre;

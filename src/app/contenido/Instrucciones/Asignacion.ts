@@ -32,7 +32,6 @@ class Asignacion extends Nodo{
             return error;
         }
 
-
         if (this.valor.tipo.type != variable.tipo.type && variable.tipo.type != tipos.ANY) {
             const error = new Errror('Semantico',
                 `No se puede asignar la variable porque los tipos no coinciden.`,

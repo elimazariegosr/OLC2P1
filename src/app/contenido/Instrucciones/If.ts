@@ -22,7 +22,6 @@ class If extends Nodo {
         const nueva_tabla = new Tabla(tabla);
         let res: Nodo;
         res = this.condicion.ejecutar(nueva_tabla, arbol);
-        console.log(res);
         if (res instanceof Errror) {
             return res;
         }
@@ -37,20 +36,17 @@ class If extends Nodo {
         }
 
         if (res) {
-            console.log("en if");
             for (let i = 0; i < this.lista_if.length; i++) {
-                const res = this.lista_if[i].ejecutar(nueva_tabla, arbol);
-                if(res instanceof Continue || res instanceof Break){
-                    return res;
+                const cont = this.lista_if[i].ejecutar(nueva_tabla, arbol);
+                if(cont instanceof Continue || cont instanceof Break){
+                    return cont;
                 }
             }
-        } else {
-            
-            console.log("en else");
+        } else {  
             for (let i = 0; i < this.lista_else.length; i++) {
-                const res = this.lista_else[i].ejecutar(nueva_tabla, arbol);
-                if(res instanceof Continue || res instanceof Break){
-                    return res;
+                const cont = this.lista_else[i].ejecutar(nueva_tabla, arbol);
+                if(cont instanceof Continue || cont instanceof Break){
+                    return cont;
                 }
             }
         }

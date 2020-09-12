@@ -12,6 +12,9 @@ class Imprimir extends Nodo{
         super(new Tipo(tipos.VOID), linea, columna);
         this.expresion = expresion;
     }
+    get_tipo(){
+        return this.tipo;
+    }
     
     ejecutar(tabla: Tabla, arbol: Arbol): any {
         const value =  this.expresion.ejecutar(tabla, arbol);

@@ -3,7 +3,6 @@ import { Tabla } from "../AST/Tabla";
 import { Arbol } from "../AST/Arbol";
 import { Errror } from "../AST/Errror";
 import { tipos, Tipo } from "../AST/Tipo";
-import { type } from 'os';
 
 class Relacional extends Nodo{
     nodo_izquierdo: Nodo;
@@ -17,6 +16,9 @@ class Relacional extends Nodo{
         this.operador = operador;
     }
 
+    get_tipo(){
+        return this.tipo;
+    }
     ejecutar(tabla: Tabla, arbol: Arbol){
         const resultado_izq = this.nodo_izquierdo.ejecutar(tabla, arbol);
         if(resultado_izq instanceof Errror){
@@ -26,7 +28,9 @@ class Relacional extends Nodo{
         if(resultado_der instanceof Errror){
             return resultado_der;
         }
-        if(this.operador == '>'){
+       
+        if(this.operador == ">"){
+               
             if(this.nodo_derecho.tipo.type == tipos.NUMBER && this.nodo_derecho.tipo.type == tipos.NUMBER){
                 return resultado_izq > resultado_der;
             }else{ 
@@ -36,7 +40,6 @@ class Relacional extends Nodo{
                 arbol.errores.push(error);
                 arbol.consola.push(error.toString());
                 return error;
-    
             }
         }else if(this.operador == '<'){
             if(this.nodo_derecho.tipo.type == tipos.NUMBER && this.nodo_derecho.tipo.type == tipos.NUMBER){

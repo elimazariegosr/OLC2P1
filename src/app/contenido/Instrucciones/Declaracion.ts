@@ -23,11 +23,12 @@ class Declaracion extends Nodo{
     }
 
     ejecutar(tabla: Tabla, arbol: Arbol){
+        let resultado = null;
         if(this.valor != null){
-            const resultado = this.valor.ejecutar(tabla, arbol);
+            resultado = this.valor.ejecutar(tabla, arbol);
             if (resultado instanceof Errror) {
                 return resultado;
-            }
+            }    
             if(this.tipo.type != this.valor.tipo.type && this.tipo.type != tipos.ANY){
                 const error = new Errror('Semantico',
                 `No se puede declarar la variable porque los tipos no coincidennnn.`,
@@ -36,21 +37,18 @@ class Declaracion extends Nodo{
                 arbol.consola.push(error.toString());
                 return error;
             }
-            let simbolo: Simbolo;
-            simbolo = new Simbolo(this.tipo, this.id, resultado);
-            const resp = tabla.set_var(simbolo);
-            if(resp != null){
-                const error = new Errror('Semantico',resp, this.linea, this.columna);
-                arbol.errores.push(error);
-                arbol.consola.push(error.toString());
-                return error;           
-            }
-        }else{
-            let simbolo: Simbolo;
-            simbolo = new Simbolo(this.tipo, this.id, null);
-            const resp = tabla.set_var(simbolo);
         }
         
+        let simbolo: Simbolo;
+        simbolo = new Simbolo(this.tipo, this.id, resultado);
+        const resp = tabla.set_var(simbolo);
+        if(resp != null){
+            const error = new Errror('Semantico',resp, this.linea, this.columna);
+            arbol.errores.push(error);
+            arbol.consola.push(error.toString());
+            return error;           
+        }
+        return null;
     }
 }
 export {Declaracion};
