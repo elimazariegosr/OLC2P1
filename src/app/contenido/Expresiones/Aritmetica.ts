@@ -36,7 +36,8 @@ class Aritmetica extends Nodo{
                     this.nodo_derecho.tipo.type == tipos.NUMBER){
                 
                     this.tipo = new Tipo(tipos.NUMBER);
-                    return resultado_izq + resultado_der;        
+                    return resultado_izq + resultado_der;
+                            
                 }else if(this.nodo_izquierdo.tipo.type == tipos.STRING || 
                     this.nodo_derecho.tipo.type == tipos.STRING){
 

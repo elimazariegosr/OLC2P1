@@ -50,6 +50,7 @@ export class ContenidoComponent implements OnInit {
         const res = m.ejecutar(this.tabla, this.arbol);
       }
     });
+    console.log(this.tabla);
     let salida = "";
     this.arbol.consola.forEach(element => {
       if(element instanceof Errror){

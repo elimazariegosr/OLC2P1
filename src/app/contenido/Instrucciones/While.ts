@@ -21,11 +21,12 @@ class While extends Nodo{
     }
 
     ejecutar(tabla:Tabla, arbol: Arbol){
-        const nueva_tabla = new Tabla(tabla);
+        let nueva_tabla = new Tabla(tabla);
         console.log(this.contenido);
         let res: Nodo;
         let contador = 0;
         do {
+            
             res = this.condicion.ejecutar(nueva_tabla, arbol);
             if (res instanceof Errror) {
                 return res;
@@ -50,6 +51,8 @@ class While extends Nodo{
                 }
             }
             contador++;
+            console.log(nueva_tabla);
+            nueva_tabla = new Tabla(nueva_tabla);
         } while (res && contador < 100000);
         return null;
     

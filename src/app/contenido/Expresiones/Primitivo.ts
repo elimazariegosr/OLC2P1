@@ -4,6 +4,7 @@ import {Tabla} from '../AST/Tabla';
 import {Arbol} from '../AST/Arbol';
 
 class Primitivo extends Nodo{
+    
     valor: Object;
 
     constructor(tipo:Tipo, valor: Object, linea: number, columna: number){
@@ -14,6 +15,7 @@ class Primitivo extends Nodo{
     get_tipo(){
         return this.tipo;
     }
+    
     ejecutar(tabla: Tabla, arbol: Arbol) {
         return this.valor;
     }

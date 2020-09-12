@@ -5,6 +5,7 @@ import {Tipo} from '../AST/Tipo';
 import {Errror} from '../AST/Errror';
 import { Simbolo } from '../AST/Simbolo';
 import {tipos} from '../AST/Tipo';
+
 class Declaracion extends Nodo{
 
     tipo_declaracion: string;

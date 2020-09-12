@@ -287,10 +287,10 @@ LISTA_CONT_LLAMADA   :   LISTA_CONT_LLAMADA TK_COMA EXPRESION {$$ = $1; $$.push(
                      |   EXPRESION { $$ = [$1];}
 ;
 
-EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}
-            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
-            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
-            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2,_$.first_line, _$.first_column);}    
+EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}
+            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
+            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
+            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
             |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}                
             |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
             |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
