@@ -18,6 +18,9 @@ class If extends Nodo {
         this.lista_else = lista_else;
     }
 
+    get_tipo(){
+        return this.tipo;
+    }
     ejecutar(tabla: Tabla, arbol: Arbol) {
         const nueva_tabla = new Tabla(tabla);
         let res: Nodo;

@@ -28,6 +28,10 @@ class Funcion extends Nodo{
         this.tipo = tipo;
         console.log("TIPOOO: " + tipo);
     }
+
+    get_tipo(){
+        return this.tipo;
+    }
     
     guardar_funcion(tabla: Tabla, arbol:Arbol){
         let simbolo: Simbolo;
@@ -47,11 +51,14 @@ class Funcion extends Nodo{
     ejecutar(tabla: Tabla, arbol: Arbol):Object{
         const nueva_tabla = new Tabla(tabla);
         let val  = null;
-        for(let i = 0;i < this.parametros.length; i++){
-            this.parametros[i].valor = this.cont_parametros[i];
-            let valor = this.parametros[i].ejecutar(nueva_tabla,arbol);
-            if(valor instanceof Errror){
-                return valor;
+        for(let i = 0;i < this.parametros.length; i++){ 
+            this.parametros[i].valor = this.cont_parametros[i].ejecutar(nueva_tabla,arbol);
+            let p = this.parametros[i];
+            console.log("p->");
+            console.log(p.valor);
+            let simbolo = new Simbolo(p.tipo, p.id, p.valor);
+            if(nueva_tabla.set_var(simbolo) != null){
+                nueva_tabla.get_var(p.id).valor = p.valor;
             }
         }
         this.contenido.forEach(element => {
@@ -65,6 +72,7 @@ class Funcion extends Nodo{
 
             }
         });
+        
         return val;
     }
 }

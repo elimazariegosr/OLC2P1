@@ -66,7 +66,7 @@ class Llamada_funcion extends Nodo{
                 }
                 parametro.ejecutar(tabla,arbol);
                 tipo2 = parametro.get_tipo();
-
+                console.log(tabla);
                 if(this.funcion.parametros[i].tipo.type != tipo2.type){
                     si_llama = false;
                 }

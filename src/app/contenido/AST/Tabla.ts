@@ -9,6 +9,7 @@ class Tabla{
         this.variables = new Map<string, Simbolo>();
     }
 
+
     set_var(simbolo: Simbolo){
         let t_actual: Tabla;
         for(t_actual = this; t_actual != null; t_actual = t_actual.t_anterior){
@@ -32,6 +33,18 @@ class Tabla{
             }
         }
         return null;
-    }   
+    }
+    
+    borrar_var(id: string){
+        let t_actual: Tabla;
+        for(t_actual = this; t_actual != null; t_actual = t_actual.t_anterior){
+            for(let key of Array.from( t_actual.variables.keys()) ) {
+                if(key === id){
+                    t_actual.variables.delete(key);
+                }
+            }
+        }
+        return null;
+     }
 }
 export{Tabla};

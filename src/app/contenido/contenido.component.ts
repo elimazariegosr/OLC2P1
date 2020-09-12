@@ -59,7 +59,7 @@ export class ContenidoComponent implements OnInit {
         salida += element + "\n";
       }
     });
-    console.log(this.arbol.consola);
+    console.log(this.arbol);
     document.getElementById('txt_consola').innerHTML = salida;
     this.reporte_ast();  
   }

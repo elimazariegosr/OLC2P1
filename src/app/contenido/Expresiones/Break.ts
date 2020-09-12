@@ -8,6 +8,7 @@ class Break extends Nodo {
         super(null, linea, columna);
     }
 
+    get_tipo(){return this.tipo};
     ejecutar(tabla: Tabla, arbol: Arbol){
         return this;
     }
