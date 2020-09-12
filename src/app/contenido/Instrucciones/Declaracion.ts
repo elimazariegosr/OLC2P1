@@ -42,7 +42,7 @@ class Declaracion extends Nodo{
         
         let simbolo: Simbolo;
         simbolo = new Simbolo(this.tipo, this.id, resultado);
-        const resp = tabla.set_var(simbolo);
+        const resp = tabla.set_variable(simbolo);
         if(resp != null){
             const error = new Errror('Semantico',resp, this.linea, this.columna);
             arbol.errores.push(error);

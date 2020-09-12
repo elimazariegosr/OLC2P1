@@ -5,6 +5,7 @@ import { Errror } from '../AST/Errror';
 import { tipos } from '../AST/Tipo';
 import { Continue } from "../Expresiones/Continue";
 import { Break } from "../Expresiones/Break";
+import { Return } from '../Expresiones/Return';
 
 class If extends Nodo {
     condicion: Nodo;
@@ -40,14 +41,24 @@ class If extends Nodo {
 
         if (res) {
             for (let i = 0; i < this.lista_if.length; i++) {
+                if(this.lista_if[i] instanceof Return){
+                    return this.lista_if[i];
+                }
+                
                 const cont = this.lista_if[i].ejecutar(nueva_tabla, arbol);
+                
                 if(cont instanceof Continue || cont instanceof Break){
                     return cont;
                 }
             }
         } else {  
             for (let i = 0; i < this.lista_else.length; i++) {
+                if(this.lista_else[i] instanceof Return){
+                    return this.lista_else[i];
+                }
                 const cont = this.lista_else[i].ejecutar(nueva_tabla, arbol);
+                
+                
                 if(cont instanceof Continue || cont instanceof Break){
                     return cont;
                 }

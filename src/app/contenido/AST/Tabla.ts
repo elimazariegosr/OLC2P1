@@ -23,6 +23,16 @@ class Tabla{
         return null;
     }
 
+    set_variable(simbolo: Simbolo){
+        for(let key of Array.from( this.variables.keys()) ) {
+            if(key === simbolo.id){
+                return `La variable ${key} ya ha sido declarada.`;
+            }
+        }
+        this.variables.set(simbolo.id, simbolo);
+        return null;
+    }
+
     get_var(identifier: String): Simbolo{
         let t_actual: Tabla;
         for(t_actual = this; t_actual != null; t_actual = t_actual.t_anterior){

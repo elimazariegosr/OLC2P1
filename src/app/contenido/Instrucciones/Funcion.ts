@@ -49,31 +49,35 @@ class Funcion extends Nodo{
     }
     
     ejecutar(tabla: Tabla, arbol: Arbol):Object{
+        let val = null;
         const nueva_tabla = new Tabla(tabla);
-        let val  = null;
-        for(let i = 0;i < this.parametros.length; i++){ 
-            this.parametros[i].valor = this.cont_parametros[i].ejecutar(nueva_tabla,arbol);
-            let p = this.parametros[i];
-            console.log("p->");
-            console.log(p.valor);
-            let simbolo = new Simbolo(p.tipo, p.id, p.valor);
-            if(nueva_tabla.set_var(simbolo) != null){
-                nueva_tabla.get_var(p.id).valor = p.valor;
-            }
+        let cont_aux = [];
+        for(let i = 0; i < this.parametros.length; i++){
+            this.parametros[i].valor = this.cont_parametros[i];
+            cont_aux.push(this.parametros[i]);
         }
         this.contenido.forEach(element => {
-           if(element instanceof Return){
-                val = element.condicion.ejecutar(nueva_tabla,arbol);
-                console.log(val);
+            cont_aux.push(element);
+        });
+
+        for(let i = 0; i < cont_aux.length; i++){
+            if(cont_aux[i] instanceof Return){
+                val = cont_aux[i].condicion.ejecutar(nueva_tabla,arbol);
+                console.log("Este es el valor" + val);
                 return val;
            }
-            let res = element.ejecutar(nueva_tabla,arbol);
-            if(res instanceof Errror){
-
+            let res = cont_aux[i].ejecutar(nueva_tabla,arbol);
+           
+            console.log(nueva_tabla);
+            if(res instanceof Return){
+                val =  res.condicion.ejecutar(nueva_tabla, arbol);
+                return val;
             }
-        });
-        
-        return val;
+            if(res instanceof Errror){
+                return new Errror("","",0,0);
+            }
+        }
+        return null;
     }
 }
 
