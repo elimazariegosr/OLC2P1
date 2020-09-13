@@ -7,15 +7,15 @@
                         <h4>Entrada </h4>
                     </td>
                     <td>
-                        <h4>Consola</h4>
+                        <h4>Traduccion</h4>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <textarea class="form-control" #entrada rows="12" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+                        <textarea class="form-control" #entrada rows="8" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
                     </td>
                     <td>
-                        <textarea class="form-control" id="txt_consola" readonly name="txt_consola" rows="12" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+                        <textarea class="form-control" id="txt_traduccion"  name="txt_traduccion" rows="8"  style="margin-top: 0px; margin-bottom: 0px;"></textarea>
                     </td>
                 </tr>
                 <tr>
@@ -26,12 +26,18 @@
                                     <button type="button"  (click) = "traducir(entrada.value)" class="btn btn-info">Traducir</button>
                                 </td>
                                 <td>
-                                    <button type="button"  onclick="" class="btn btn-info">Traducir</button>
+                                    <button type="button"  (click) = "ejecutar(entrada.value)" class="btn btn-info">Ejecutar</button>
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr>
+                <tr>
+                    <h4>Consola</h4>
+                    <textarea class="form-control" id="txt_consola" readonly name="txt_consola" rows="5" style="margin-top: 0px; margin-bottom: 0px;"></textarea>
+                    
+                </tr>
+                
             </table>
         </div>         
     </form>       

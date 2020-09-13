@@ -26,7 +26,6 @@ class Funcion extends Nodo{
         this.guardada = false;
         this.cont_parametros = [];
         this.tipo = tipo;
-        console.log("TIPOOO: " + tipo);
     }
 
     get_tipo(){
@@ -63,12 +62,10 @@ class Funcion extends Nodo{
         for(let i = 0; i < cont_aux.length; i++){
             if(cont_aux[i] instanceof Return){
                 val = cont_aux[i].condicion.ejecutar(nueva_tabla,arbol);
-                console.log("Este es el valor" + val);
                 return val;
            }
             let res = cont_aux[i].ejecutar(nueva_tabla,arbol);
            
-            console.log(nueva_tabla);
             if(res instanceof Return){
                 val =  res.condicion.ejecutar(nueva_tabla, arbol);
                 return val;

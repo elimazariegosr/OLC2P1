@@ -41,8 +41,6 @@ class Llamada_funcion extends Nodo{
                 this.tipo = this.funcion.tipo;
             }
 
-            console.log("Buscando funcion " + this.funcion);
-        
         }
     }
     ejecutar(tabla:Tabla, arbol:Arbol):Object{
@@ -66,7 +64,6 @@ class Llamada_funcion extends Nodo{
                 }
                 parametro.ejecutar(tabla,arbol);
                 tipo2 = parametro.get_tipo();
-                console.log(tabla);
                 if(this.funcion.parametros[i].tipo.type != tipo2.type){
                     si_llama = false;
                 }
@@ -82,10 +79,7 @@ class Llamada_funcion extends Nodo{
             for(let i = 0; i <  this.parametros.length; i++){
                 this.funcion.cont_parametros[i] = this.parametros[i];
             }
-            console.log("Ejecutando funcion");
             let ast = this.funcion.ejecutar(tabla, arbol);
-           
-            console.log(ast); 
             return ast;
         }else{
             const error = new Errror('Semantico',

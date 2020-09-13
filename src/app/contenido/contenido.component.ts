@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
+import {Desanidar} from './Complemento/Desanidar';
+
 import {Arbol} from './AST/Arbol';
 import {Tabla} from './AST/Tabla';
 import {Imprimir} from './Instrucciones/Imprimir';
@@ -9,6 +12,7 @@ import {If} from './Instrucciones/If';
 import {While} from './Instrucciones/While';
 import {Funcion} from './Instrucciones/Funcion';
 import {Llamada_funcion} from './Instrucciones/Llamada_funcion';
+
 
 import {Primitivo} from './Expresiones/Primitivo';
 import {Aritmetica} from './Expresiones/Aritmetica';
@@ -36,9 +40,14 @@ export class ContenidoComponent implements OnInit {
   
   arbol:Arbol;
   tabla:Tabla;
-    
-  traducir(entrada:string):void{
-    this.tabla = new Tabla(null);
+  desanidacion = new Desanidar();
+  
+
+  ejecutar(entrada:string):void{
+      this.arbol = parser.parse(entrada);
+      if(!this.desanidacion.hay_anidada(this.arbol)){
+        //EJECUCION
+        this.tabla = new Tabla(null);
     if (document.getElementById("grafo")) {
       document.getElementById("grafo").remove();
     }
@@ -50,6 +59,7 @@ export class ContenidoComponent implements OnInit {
         const res = m.ejecutar(this.tabla, this.arbol);
       }
     });
+
     console.log(this.tabla);
     let salida = "";
     this.arbol.consola.forEach(element => {
@@ -62,7 +72,17 @@ export class ContenidoComponent implements OnInit {
     });
     console.log(this.arbol);
     document.getElementById('txt_consola').innerHTML = salida;
-    this.reporte_ast();  
+    this.reporte_ast();
+      }else{
+        alert("No puede ejecutar si hay funciones anidadas");
+      }
+  }
+  
+  traducir(entrada:string):void{
+      this.arbol = parser.parse(entrada);     
+      let resultado = this.desanidacion.desanidar(this.arbol);
+      document.getElementById('txt_traduccion').innerHTML = resultado;
+   
   }
 
   reporte_ast(){
@@ -103,7 +123,8 @@ export class ContenidoComponent implements OnInit {
           let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
           izq.parent = exp;
           exp.children.push(izq);
-        } 
+        }
+
         exp.children.push(new Nodo_AST(element.operador,exp,[]));
    
         if(element.nodo_derecho != null){
