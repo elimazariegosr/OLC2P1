@@ -13,17 +13,19 @@ class Declaracion extends Nodo{
     id: string;
     valor: Nodo;
 
-    constructor(tipo: Tipo, id: string, valor: Nodo, linea: number, columna: number) {
+    constructor(tipo_declaracion:string, tipo: Tipo, id: string, valor: Nodo, linea: number, columna: number) {
         if(tipo == null){
             tipo = new Tipo(tipos.ANY);
         }
         super(tipo, linea, columna);
         this.id = id;
         this.valor = valor;
+        this.tipo_declaracion = tipo_declaracion;
         
     }
 
     get_tipo(){return this.tipo};
+    
     ejecutar(tabla: Tabla, arbol: Arbol){
         let resultado = null;
         if(this.valor != null){
@@ -33,11 +35,13 @@ class Declaracion extends Nodo{
             }    
             if(this.tipo.type != this.valor.tipo.type && this.tipo.type != tipos.ANY){
                 const error = new Errror('Semantico',
-                `No se puede declarar la variable porque los tipos no coincidennnn.`,
+                `No se puede declarar la variable porque los tipos no coinciden.`,
                 this.linea, this.columna);
                 arbol.errores.push(error);
                 arbol.consola.push(error.toString());
                 return error;
+            }else if(this.tipo.type == tipos.ANY){
+                this.tipo = this.valor.tipo;
             }
         }
         

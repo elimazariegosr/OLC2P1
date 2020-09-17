@@ -3,7 +3,9 @@ enum tipos{
     STRING,
     BOOLEAN,
     VOID,
-    ANY
+    ANY,
+    ARREGLO,
+    TYPE
 }
 
 class Tipo{

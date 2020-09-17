@@ -6,43 +6,34 @@ import { tipos } from '../AST/Tipo';
 import { Break } from '../Expresiones/Break';
 import { Continue } from '../Expresiones/Continue';
 import { Return } from '../Expresiones/Return';
-import { Asignacion } from './Asignacion';
-import { Declaracion } from './Declaracion';
 
-class For extends Nodo{
-
-    exp1:Object;
-    exp2:Nodo;
-    exp3:Asignacion;
+class Do_while extends Nodo{
+    
+    condicion: Nodo;
     contenido: Array<Nodo>;
 
-    constructor(exp1:Object, exp2:Nodo, exp3:Asignacion, contenido: Array<Nodo>,linea:number, columna:number){
+    constructor(condicion: Nodo, contenido: Array<Nodo>, linea: number, columna: number) {
         super(null, linea, columna);
-        this.exp1 = exp1;
-        this.exp2 = exp2;
-        this.exp3 = exp3;
+        this.condicion = condicion;
         this.contenido = contenido;
     }
-
     get_tipo(){
-
+        
     }
 
-    ejecutar(tabla: Tabla, arbol: Arbol){
+
+    ejecutar(tabla:Tabla, arbol: Arbol){
         let nueva_tabla = new Tabla(tabla);
-        let res;
+        let res: Nodo;
         let contador = 0;
-        if(this.exp1 instanceof Declaracion || this.exp1 instanceof Asignacion){
-            this.exp1.ejecutar(nueva_tabla, arbol);
-        }
         do {
-            res = this.exp2.ejecutar(nueva_tabla, arbol);
-            console.log(res);
-            if (res instanceof Error) {
+            
+            res = this.condicion.ejecutar(nueva_tabla, arbol);
+            if (res instanceof Errror) {
                 return res;
             }
 
-            if (this.exp2.tipo.type != tipos.BOOLEAN) {
+            if (this.condicion.tipo.type != tipos.BOOLEAN) {
                 const error = new Errror('Semantico',
                     `Se esperaba una expresion booleana para la condicion`,
                     this.linea, this.columna);
@@ -50,8 +41,7 @@ class For extends Nodo{
                     arbol.consola.push(error.toString());
                     return error;        
               }
-            
-            if(res){
+            if (res) {
                 for (let i = 0; i < this.contenido.length; i++) {
                     if(this.contenido[i] instanceof Return){
                         return this.contenido[i];
@@ -64,15 +54,15 @@ class For extends Nodo{
                     if(cont instanceof Continue || cont instanceof Break){
                         return cont;
                     }
-                }   
+                }
             }else{
                 return null;
             }
             contador++;
             nueva_tabla = new Tabla(nueva_tabla);
-            this.exp3.ejecutar(nueva_tabla,arbol);
-            } while (res && contador < 1000);
- 
+        } while (res && contador < 999999999);
+        return null;
+    
     }
 }
-export{For};
+export{Do_while};

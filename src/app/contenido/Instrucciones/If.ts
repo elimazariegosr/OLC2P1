@@ -11,12 +11,14 @@ class If extends Nodo {
     condicion: Nodo;
     lista_if: Array<Nodo>;
     lista_else: Array<Nodo>;
+    elseif:boolean;
 
-    constructor(condicion: Nodo, lista_if: Array<Nodo>, lista_else: Array<Nodo>, linea: number, columna: number) {
+    constructor(elseif:boolean,condicion: Nodo, lista_if: Array<Nodo>, lista_else: Array<Nodo>, linea: number, columna: number) {
         super(null, linea, columna);
         this.condicion = condicion;
         this.lista_if = lista_if;
         this.lista_else = lista_else;
+        this.elseif = elseif;
     }
 
     get_tipo(){
@@ -40,13 +42,16 @@ class If extends Nodo {
         }
 
         if (res) {
+
             for (let i = 0; i < this.lista_if.length; i++) {
                 if(this.lista_if[i] instanceof Return){
                     return this.lista_if[i];
                 }
                 
                 const cont = this.lista_if[i].ejecutar(nueva_tabla, arbol);
-                
+                    if(cont instanceof Return){
+                    return cont;
+                }
                 if(cont instanceof Continue || cont instanceof Break){
                     return cont;
                 }
@@ -57,6 +62,9 @@ class If extends Nodo {
                     return this.lista_else[i];
                 }
                 const cont = this.lista_else[i].ejecutar(nueva_tabla, arbol);
+                if(cont instanceof Return){
+                    return cont;
+                }
                 
                 
                 if(cont instanceof Continue || cont instanceof Break){

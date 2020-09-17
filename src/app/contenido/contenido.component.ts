@@ -10,8 +10,17 @@ import {Identificador} from './Instrucciones/Identificador';
 import {Declaracion} from './Instrucciones/Declaracion';
 import {If} from './Instrucciones/If';
 import {While} from './Instrucciones/While';
+import {Do_while} from './Instrucciones/Do_while';
 import {Funcion} from './Instrucciones/Funcion';
 import {Llamada_funcion} from './Instrucciones/Llamada_funcion';
+import {Ternario} from './Instrucciones/Ternario';
+import {For} from './Instrucciones/For';
+import {For_1} from './Instrucciones/For_1';
+import {Switch} from './Instrucciones/Switch';
+import {Case} from './Instrucciones/Case';
+import {Default} from './Instrucciones/Default';
+
+
 
 
 import {Primitivo} from './Expresiones/Primitivo';
@@ -26,7 +35,7 @@ import { Nodo_AST } from './AST/Nodo_AST';
 import { Nodo } from './AST/Nodo';
 const parser  = require('./analizador.js');
 
-declare var generateTree;
+  declare var generateTree;
   
 @Component({
   selector: 'app-contenido',
@@ -48,37 +57,45 @@ export class ContenidoComponent implements OnInit {
       if(!this.desanidacion.hay_anidada(this.arbol)){
         //EJECUCION
         this.tabla = new Tabla(null);
-    if (document.getElementById("grafo")) {
-      document.getElementById("grafo").remove();
-    }
-    this.arbol = parser.parse(entrada);
-    this.arbol.instrucciones.map((m: any) =>{
-      if(m instanceof Funcion){
-          m.guardar_funcion(this.tabla, this.arbol);
-      }else{
-        const res = m.ejecutar(this.tabla, this.arbol);
-      }
-    });
+        if (document.getElementById("grafo")) {
+          document.getElementById("grafo").remove();
+        }
+        this.arbol = parser.parse(entrada);
+        this.arbol.instrucciones.map((m: any) =>{
+          if(m instanceof Funcion){
+              m.guardar_funcion(this.tabla, this.arbol);
+          }else{
+            const res = m.ejecutar(this.tabla, this.arbol);
+          }
+        });
 
-    console.log(this.tabla);
-    let salida = "";
-    this.arbol.consola.forEach(element => {
-      if(element instanceof Errror){
-        salida += element.desc + "\n";
+        console.log(this.tabla);
+        let salida = "";
+        this.arbol.consola.forEach(element => {
+          if(element instanceof Errror){
+            salida += element.desc + "\n";
     
+          }else{
+            salida += element + "\n";
+          }
+        });
+        console.log(this.arbol);
+        document.getElementById('txt_consola').innerHTML = salida;
+        this.reporte_ast();
       }else{
-        salida += element + "\n";
-      }
-    });
-    console.log(this.arbol);
-    document.getElementById('txt_consola').innerHTML = salida;
-    this.reporte_ast();
-      }else{
-        alert("No puede ejecutar si hay funciones anidadas");
+          alert("No puede ejecutar si hay funciones anidadas");
       }
   }
-  
+
   traducir(entrada:string):void{
+    
+    let a = "10";
+
+    for(let i of a){
+        console.log(a[0]);
+    }
+
+
       this.arbol = parser.parse(entrada);     
       let resultado = this.desanidacion.desanidar(this.arbol);
       document.getElementById('txt_traduccion').innerHTML = resultado;
@@ -118,7 +135,7 @@ export class ContenidoComponent implements OnInit {
   }
   ast(element):any{
     let exp = new Nodo_AST("E",null,[]);
-    if(element instanceof Aritmetica){     
+    if(element instanceof Aritmetica || element instanceof Logica){     
       if(element.nodo_izquierdo != null){
           let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
           izq.parent = exp;

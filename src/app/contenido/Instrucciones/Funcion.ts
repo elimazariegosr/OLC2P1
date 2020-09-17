@@ -18,6 +18,9 @@ class Funcion extends Nodo{
     guardada: boolean;
   
     constructor(nombre: string, parametros: Array<Declaracion>, contenido: Array<Nodo>, tipo:Tipo, linea: number, columna: number){
+        if(tipo == null){
+            tipo = new Tipo(tipos.ANY);
+        }
         super(tipo, linea, columna);
         this.nombre = nombre;
         this.contenido = contenido;
@@ -25,7 +28,6 @@ class Funcion extends Nodo{
         this.generar_id();
         this.guardada = false;
         this.cont_parametros = [];
-        this.tipo = tipo;
     }
 
     get_tipo(){
@@ -65,7 +67,6 @@ class Funcion extends Nodo{
                 return val;
            }
             let res = cont_aux[i].ejecutar(nueva_tabla,arbol);
-           
             if(res instanceof Return){
                 val =  res.condicion.ejecutar(nueva_tabla, arbol);
                 return val;

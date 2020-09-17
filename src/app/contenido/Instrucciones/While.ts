@@ -5,6 +5,7 @@ import { Errror } from '../AST/Errror';
 import { tipos } from '../AST/Tipo';
 import { Continue } from "../Expresiones/Continue";
 import { Break } from "../Expresiones/Break";
+import { Return } from '../Expresiones/Return';
 
 class While extends Nodo{
 
@@ -19,6 +20,8 @@ class While extends Nodo{
     get_tipo(){
         
     }
+
+    v():number{return 0;}
 
     ejecutar(tabla:Tabla, arbol: Arbol){
         let nueva_tabla = new Tabla(tabla);
@@ -41,17 +44,24 @@ class While extends Nodo{
               }
             if (res) {
                 for (let i = 0; i < this.contenido.length; i++) {
-                    const val = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                    if (val instanceof Continue) {
-                        break;
-                    } else if (val instanceof Break) {
-                        return;
+                    if(this.contenido[i] instanceof Return){
+                        return this.contenido[i];
+                    }
+                    
+                    const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
+                        if(cont instanceof Return){
+                        return cont;
+                    }
+                    if(cont instanceof Continue || cont instanceof Break){
+                        return cont;
                     }
                 }
+            }else{
+                return null;
             }
             contador++;
             nueva_tabla = new Tabla(nueva_tabla);
-        } while (res && contador < 100000);
+        } while (res && contador < 999999999);
         return null;
     
     }
