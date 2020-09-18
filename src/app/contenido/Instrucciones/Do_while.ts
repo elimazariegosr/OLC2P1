@@ -41,7 +41,6 @@ class Do_while extends Nodo{
                     arbol.consola.push(error.toString());
                     return error;        
               }
-            if (res) {
                 for (let i = 0; i < this.contenido.length; i++) {
                     if(this.contenido[i] instanceof Return){
                         return this.contenido[i];
@@ -55,11 +54,9 @@ class Do_while extends Nodo{
                         return cont;
                     }
                 }
-            }else{
-                return null;
-            }
+            
             contador++;
-            nueva_tabla = new Tabla(nueva_tabla);
+            nueva_tabla = new Tabla(tabla);
         } while (res && contador < 999999999);
         return null;
     

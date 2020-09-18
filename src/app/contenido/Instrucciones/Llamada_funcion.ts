@@ -45,6 +45,7 @@ class Llamada_funcion extends Nodo{
     }
     ejecutar(tabla:Tabla, arbol:Arbol):Object{
         this.buscar_funcion(tabla);
+        this.graficar_ts();
         if(this.funcion instanceof Funcion){
             if(this.funcion.parametros.length != this.parametros.length){
                 const error = new Errror('Semantico',

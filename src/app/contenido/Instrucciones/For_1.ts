@@ -63,7 +63,7 @@ class For_1 extends Nodo{
                     return cont;
                 }
             }
-            nueva_tabla = new Tabla(nueva_tabla);   
+            nueva_tabla = new Tabla(tabla);   
         }
     }
 }

@@ -11,6 +11,9 @@ abstract class Nodo{
 
     abstract ejecutar(tabla: Tabla, arbol: Arbol): any;
 
+    graficar_ts(){
+        
+    }
     abstract get_tipo():any;
     
     constructor(tipo: Tipo, linea: number, columna: number) {

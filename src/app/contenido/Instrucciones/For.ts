@@ -33,7 +33,7 @@ class For extends Nodo{
         let res;
         let contador = 0;
         if(this.exp1 instanceof Declaracion || this.exp1 instanceof Asignacion){
-            this.exp1.ejecutar(nueva_tabla, arbol);
+            this.exp1.ejecutar(tabla, arbol);
         }
         do {
             res = this.exp2.ejecutar(nueva_tabla, arbol);
@@ -69,7 +69,7 @@ class For extends Nodo{
                 return null;
             }
             contador++;
-            nueva_tabla = new Tabla(nueva_tabla);
+            nueva_tabla = new Tabla(tabla);
             this.exp3.ejecutar(nueva_tabla,arbol);
             } while (res && contador < 1000);
  
