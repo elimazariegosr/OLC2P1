@@ -11,14 +11,12 @@ class If extends Nodo {
     condicion: Nodo;
     lista_if: Array<Nodo>;
     lista_else: Array<Nodo>;
-    elseif:boolean;
-
-    constructor(elseif:boolean,condicion: Nodo, lista_if: Array<Nodo>, lista_else: Array<Nodo>, linea: number, columna: number) {
+  
+    constructor(condicion: Nodo, lista_if: Array<Nodo>, lista_else: Array<Nodo>, linea: number, columna: number) {
         super(null, linea, columna);
         this.condicion = condicion;
         this.lista_if = lista_if;
         this.lista_else = lista_else;
-        this.elseif = elseif;
     }
 
     get_tipo(){

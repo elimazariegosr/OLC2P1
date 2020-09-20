@@ -89,61 +89,90 @@ export class ContenidoComponent implements OnInit {
 
   traducir(entrada:string):void{
     
-    let a = "10";
-
-    for(let i of a){
-        console.log(a[0]);
-    }
-
-
       this.arbol = parser.parse(entrada);     
       let resultado = this.desanidacion.desanidar(this.arbol);
       document.getElementById('txt_traduccion').innerHTML = resultado;
    
   }
 
-  reporte_ast(){
-    let results = new Nodo_AST("Instrucciones",null,[]);
-    
-    this.arbol.instrucciones.forEach(element => {
-      let padre = new Nodo_AST("",null,[]);
-      let hijo: Nodo_AST;
-     
-      if(element instanceof Imprimir){
-            padre.name = "Imprimir";
-            hijo = this.ast(element.expresion);
-            
-        }else if(element instanceof Declaracion){
-          padre.name = "Declaracion " + element.id;
-          hijo = this.ast(element.valor);
-        }else if(element instanceof Asignacion){
-          padre.name = "Asignacion " + element.id;
-          hijo = this.ast(element.valor);
-        }else if(element instanceof If){
-          padre.name = "If";
-          hijo = this.ast(element);
-        }  
-        if(padre.name != ""){
-          hijo.parent = padre;
-          padre.children.push(hijo);
-          padre.parent = results;
-          results.children.push(padre);
-        }    
-    });
-    results.children.push(new Nodo_AST("S",null,[]));
-    generateTree([results]); 
+  sentencias_ast(sent):any{
+    if(sent instanceof If){
+      return this.if_ast(sent);
+    }else if(sent instanceof Declaracion){
+      return this.declaracion_ast(sent);
+    }else if(sent instanceof Asignacion){
+      return this.asignacion_ast(sent);
+    }else if(sent instanceof Break){
+    }else if(sent instanceof Continue){
+    }else if(sent instanceof Return){
+    }else if(sent instanceof While){
+      return this.while_ast(sent);
+    }else if(sent instanceof Do_while){
+    }else if(sent instanceof For){
+    }else if(sent instanceof For_1){
+    }else if(sent instanceof Imprimir){
+    }else if(sent instanceof Llamada_funcion){
+    } 
   }
+  if_ast(sent:If):any{
+    let padre = new Nodo_AST("If", null,[]); 
+    let condicion = new Nodo_AST("Condicion", padre,[]);
+    let cont_if = new Nodo_AST("Contenido If", padre,[]);
+    let cont_else = new Nodo_AST("Contenido Else", padre,[]);
+    condicion.children.push(this.ast(sent.condicion));
+    sent.lista_if.forEach(element => {
+      cont_if.children.push(this.sentencias_ast(element));
+    });
+    sent.lista_else.forEach(element => {
+      cont_else.children.push(this.sentencias_ast(element));
+    });       
+    padre.children = [condicion, cont_if, cont_else];
+    return padre;
+  }
+  while_ast(sent: While){
+    let padre = new Nodo_AST("While", null,[]); 
+    let condicion = new Nodo_AST("Condicion", padre,[]);
+    let contenido = new Nodo_AST("Contenido", padre,[]);
+    condicion.children.push(this.ast(sent.condicion));
+    sent.contenido.forEach(element => {
+      contenido.children.push(this.sentencias_ast(element));
+    });
+    padre.children = [condicion, contenido];
+    return padre;
+  }
+
+  declaracion_ast(sent: Declaracion){
+    let padre = new Nodo_AST("Declaracion " + sent.id, null,[]); 
+    padre.children.push(this.ast(sent.valor)); 
+    return padre;
+  }
+  asignacion_ast(sent: Asignacion){
+    let padre = new Nodo_AST("Asignacion " + sent.id, null,[]); 
+    padre.children.push(this.ast(sent.valor)); 
+    return padre; 
+  }
+  
+  llamada_funcion_ast(sent: Llamada_funcion){
+      let padre =  new Nodo_AST("LLamada Funcion " + sent.nombre, null, []);
+      sent.parametros.forEach(element => {
+        padre.children.push(this.ast(element));
+      });
+      return padre;
+  }
+
+
+  
+
   ast(element):any{
     let exp = new Nodo_AST("E",null,[]);
-    if(element instanceof Aritmetica || element instanceof Logica){     
+    if(element instanceof Aritmetica || element instanceof Logica || element instanceof Relacional){     
       if(element.nodo_izquierdo != null){
           let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
           izq.parent = exp;
           exp.children.push(izq);
         }
-
         exp.children.push(new Nodo_AST(element.operador,exp,[]));
-   
+
         if(element.nodo_derecho != null){
           let der: Nodo_AST= this.ast(element.nodo_derecho);
           der.parent = exp;
@@ -151,20 +180,27 @@ export class ContenidoComponent implements OnInit {
       } 
     }else if(element instanceof Primitivo){
       let hijo = new Nodo_AST(element.valor.toString(), null, []);
-      let e = new Nodo_AST("E",null,[hijo]);
-   
+      let e = new Nodo_AST("E",null,[hijo]);   
       return e;
+
     }else if(element instanceof Identificador){
-      let valor = this.tabla.get_var(element.id);
       let hijo = new Nodo_AST(element.id.toString(), null, []);
-      let nieto = new Nodo_AST(valor.valor.toString(), null, []);
-      hijo.children.push(nieto);
-      nieto.parent = hijo;
-      let e = new Nodo_AST("E",null,[hijo]);
-   
+      let e = new Nodo_AST("E",null,[hijo]); 
       return e; 
+    }else if(element instanceof Llamada_funcion){
+      let hijo = this.llamada_funcion_ast(element);
+      let e = new Nodo_AST("E",null,[hijo]); 
+      return e;
     }
     return exp;
+  }
+
+  reporte_ast(){
+    let raiz = new Nodo_AST("Raiz",null,[]);  
+    this.arbol.instrucciones.forEach(element => {
+      raiz.children.push(this.sentencias_ast(element));      
+    });
+    generateTree([raiz]); 
   }
   ngOnInit(): void {
     

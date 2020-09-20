@@ -45,8 +45,9 @@ class Llamada_funcion extends Nodo{
     }
     ejecutar(tabla:Tabla, arbol:Arbol):Object{
         this.buscar_funcion(tabla);
-        this.graficar_ts();
-        if(this.funcion instanceof Funcion){
+        if(this.nombre == "graficar_ts"){
+            this.graficar_ts(tabla);
+        } else if(this.funcion instanceof Funcion){
             if(this.funcion.parametros.length != this.parametros.length){
                 const error = new Errror('Semantico',
                 "Error en llamada de funcion: \"" + this.id + "\". La cantidad de parametros no cumple." ,

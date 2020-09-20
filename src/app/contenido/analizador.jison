@@ -28,16 +28,12 @@
     const {For_1} = require('./Instrucciones/For_1');
     
     let tipo_dec = "";
-    let elseif = false;    
-    function agregar_vars(arreglo, lista){
-        if(arreglo[0] != ""){
-                arreglo[1].forEach(element => {
-                        lista.push(element);
-                });
-        }else{
-                lista.push(arreglo[1]);
-        }
-        return lista;
+   
+    function unir_listas(lista1, lista2){
+        lista1.forEach(element => {
+                lista2.push(element);  
+        });
+        return lista2;
     }
 %}
 
@@ -184,8 +180,8 @@ BSL               "\\".
 INIT    :   SENTENCIAS EOF {$$ = new Arbol($1); console.log($1); return $$;}
 ;
 
-FUNCION   :   TK_FUNCTION TK_ID PARAMETROS  CONT_FUNCION {$$ = new Funcion($2,$3,$4,null,0,0);}
-          |   TK_FUNCTION TK_ID PARAMETROS TK_DOS_PUNTOS TIPO CONT_FUNCION {$$ = new Funcion($2,$3,$6,$5,0,0);}
+FUNCION   :   TK_FUNCTION TK_ID PARAMETROS  CONT_FUNCION {$$ = new Funcion($2,$3,$4,null,this._$.first_line,this._$.first_column);}
+          |   TK_FUNCTION TK_ID PARAMETROS TK_DOS_PUNTOS TIPO CONT_FUNCION {$$ = new Funcion($2,$3,$6,$5,this._$.first_line,this._$.first_column);}
 ;
 
 CONT_FUNCION    :    TK_LL_ABRE LISTA_CONT_FUNCION TK_LL_CIERRA {$$ = $2;}
@@ -208,45 +204,45 @@ LISTA_PARAMETROS    :    LISTA_PARAMETROS TK_COMA PARAMETRO { $$ = $1; $$.push($
                     |    PARAMETRO  {$$ = [$1];} 
 ;
 
-PARAMETRO    :    TK_ID { $$ = new Declaracion("let",null, $1, null, 0,0);}
-             |    TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion("let",$3, $1, null,0,0);}   
+PARAMETRO    :    TK_ID { $$ = new Declaracion("let",null, $1, null, this._$.first_line,this._$.first_column);}
+             |    TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion("let",$3, $1, null,this._$.first_line,this._$.first_column);}   
 ;             
 
 /******************************************* RAIZ *********************************************************/
-SENTENCIAS    :   SENTENCIAS CONT_SENTENCIAS { $$ = $1; $$ = agregar_vars($2, $$);}
-              |   CONT_SENTENCIAS {$$ = []; $$ = agregar_vars($1, $$);}   
+SENTENCIAS    :   SENTENCIAS CONT_SENTENCIAS { $$ = $1; $$ = unir_listas($2,$$);}
+              |   CONT_SENTENCIAS {$$ = []; $$ = unir_listas($1,$$);}   
 ;
 
 /******************************************* CONTENIDO RAIZ **********************************************/
-CONT_SENTENCIAS   :   IMPRIMIR {$$ = ["",$1];}
-                  |   DECLARACION_VARIABLE {$$ = ["Si", $1];}
-                  |   ASiGNACION_VARIABLE {$$ = ["",$1];}  
-                  |   SENTENCIA_IF {$$ = ["",$1];}
-                  |   SENTENCIA_WHILE {$$ = ["",$1];}
-                  |   SENTENCIA_DO_WHILE {$$ = ["",$1];} 
-                  |   FUNCION {$$ = ["", $1];}   
-                  |   LLAMADA_FUNCION{$$ = ["", $1];}
-                  |   RETURN {  $$ = ["",$1];}
-                  |   SENTENCIA_FOR{$$ = ["", $1];}  
-                  |   SENTENCIA_FOR_1 {$$ = ["", $1];}  
-                  |   SENT_INC_DEC {$$ = ["",$1];}
-                  |   SENTENCIA_SWITCH {$$ = ["",$1];}
-                  |   BREAK {$$ = ["", $1];}
-                  |   CONTINUE {$$ = ["", $1];}
-                  |   DECLARACION_ARREGLO {$$ = ["", $1];}
-                  |   DECLARACION_TYPE {$$ = ["", $1];}
-                  |   ASIGNACION_TYPE {$$ = ["", $1];}
+CONT_SENTENCIAS   :   IMPRIMIR {$$ = [$1];}
+                  |   DECLARACION_VARIABLE {$$ = $1;}
+                  |   ASiGNACION_VARIABLE {$$ = [$1];}  
+                  |   SENTENCIA_IF {$$ = [$1];}
+                  |   SENTENCIA_WHILE {$$ = [$1];}
+                  |   SENTENCIA_DO_WHILE {$$ = [$1];} 
+                  |   FUNCION {$$ = [$1];}   
+                  |   LLAMADA_FUNCION{$$ = [$1];}
+                  |   RETURN {  $$ = [$1];}
+                  |   SENTENCIA_FOR{$$ = [$1];}  
+                  |   SENTENCIA_FOR_1 {$$ = [$1];}  
+                  |   SENT_INC_DEC {$$ = [$1];}
+                  |   SENTENCIA_SWITCH {$$ = [$1];}
+                  |   BREAK {$$ = [$1];}
+                  |   CONTINUE {$$ = [$1];}
+                  |   DECLARACION_ARREGLO {$$ = [$1];}
+                  |   DECLARACION_TYPE {$$ = [$1];}
+                  |   ASIGNACION_TYPE {$$ = [$1];}
 ;
 /******************************************* FIN RAIZ ****************************************************/
 
-RETURN    :    TK_RETURN TK_P_COMA {$$ = new Return(null, 0,0);}0
-          |    TK_RETURN EXPRESION TK_P_COMA{$$ = new Return($2, 0,0);}
+RETURN    :    TK_RETURN TK_P_COMA {$$ = new Return(null, this._$.first_line,this._$.first_column);}
+          |    TK_RETURN EXPRESION TK_P_COMA{$$ = new Return($2, this._$.first_line,this._$.first_column);}
 ;
 
-BREAK   :   TK_BREAK TK_P_COMA{$$ = new Break(0,0);}
+BREAK   :   TK_BREAK TK_P_COMA{$$ = new Break(this._$.first_line,this._$.first_column);}
 ;
 
-CONTINUE   :   TK_CONTINUE TK_P_COMA {$$ = new Continue(0,0);}  
+CONTINUE   :   TK_CONTINUE TK_P_COMA {$$ = new Continue(this._$.first_line,this._$.first_column);}  
 ;
 
 /******************************************* DECLARACION VAR *********************************************/
@@ -257,10 +253,10 @@ LISTA_DECLARACION     :     LISTA_DECLARACION TK_COMA DECLARACION { $$ = $1; $$.
                       |     DECLARACION {$$ = [$1];}
 ;
 
-DECLARACION     :     TK_ID {console.log(tipo_dec); $$ = new Declaracion(tipo_dec,null, $1, null, 0,0);}
-                |     TK_ID TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,null, $1, $3, 0,0);}
-                |     TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion(tipo_dec,$3, $1, null,0,0);}
-                |     TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,$3, $1, $5,0,0);}
+DECLARACION     :     TK_ID {$$ = new Declaracion(tipo_dec,null, $1, null, this._$.first_line,this._$.first_column);}
+                |     TK_ID TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,null, $1, $3, this._$.first_line,this._$.first_column);}
+                |     TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion(tipo_dec,$3, $1, null,this._$.first_line,this._$.first_column);}
+                |     TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,$3, $1, $5,this._$.first_line,this._$.first_column);}
 ;          
 
 TIPO_DECLARACION    :   TK_LET  {$$ = $1; tipo_dec = $1;}
@@ -273,14 +269,15 @@ ASiGNACION_VARIABLE     :    ASIGNACION TK_P_COMA  {$$ = $1;}
                         |    ASIGNACION TK_P_COMA  {$$ =$1;}
 ;
 
-ASIGNACION    :    TK_ID TK_IGUAL EXPRESION {$$ = new Asignacion($1,$3,0,0);}
+ASIGNACION    :    TK_ID TK_IGUAL EXPRESION {$$ = new Asignacion($1,$3,this._$.first_line,this._$.first_column);}
               |    SENT_INC_DEC {$$ = $1;}
 ;                   
 /******************************************* FIN ASIGNACION VAR ******************************************/
 
 /******************************************* DECLARACION ARREGLO *****************************************/
 DECLARACION_ARREGLO   :   TIPO_DECLARACION TK_ID TK_DOS_PUNTOS TIPO TIPO_ARREGLO TK_P_COMA
-                      |   TIPO_DECLARACION TK_ID TK_DOS_PUNTOS TIPO TIPO_ARREGLO TK_IGUAL CONT_ARREGLO TK_P_COMA
+                      |   TIPO_DECLARACION TK_ID TK_DOS_PUNTOS TIPO TIPO_ARREGLO TK_IGUAL 
+                          CONT_ARREGLO TK_P_COMA
 ; 
 
 CONT_ARREGLO   :   TK_C_ABRE LISTA_CONT_ARREGLO TK_C_C  IERRA
@@ -330,7 +327,7 @@ CONT_ASIG_TIPE   :   TK_ID TK_DOS_PUNTOS EXPRESION {$$ = [$1, $3];}
 
 
 /******************************************* SENTENCIA SWITCH  *******************************************/
-SENTENCIA_SWITCH   :   TK_SWITCH CONDICIONAL CONT_SWITCH {$$ = new Switch($2, $3,0,0);} 
+SENTENCIA_SWITCH   :   TK_SWITCH CONDICIONAL CONT_SWITCH {$$ = new Switch($2, $3,this._$.first_line,this._$.first_column);} 
 ;
 
 CONT_SWITCH    :   TK_LL_ABRE LISTA_CASES TK_LL_CIERRA {$$ = $2;}
@@ -341,10 +338,10 @@ LISTA_CASES    :    LISTA_CASES CASES {$$ = $1; $$.push($2);}
               |    CASES {$$ = [$1];}
 ;
 
-CASES    :    TK_CASE EXPRESION TK_DOS_PUNTOS CONT_CASE {$$ = new Case($2, $4,0,0);}
-         |    TK_CASE EXPRESION TK_DOS_PUNTOS {$$ = new Case($2, [],0,0);}
-         |    TK_DEFAULT TK_DOS_PUNTOS CONT_CASE {$$ = new Default($3,0,0);}
-         |    TK_DEFAULT TK_DOS_PUNTOS {$$ = new Default([],0,0);}
+CASES    :    TK_CASE EXPRESION TK_DOS_PUNTOS CONT_CASE {$$ = new Case($2, $4,this._$.first_line,this._$.first_column);}
+         |    TK_CASE EXPRESION TK_DOS_PUNTOS {$$ = new Case($2, [],this._$.first_line,this._$.first_column);}
+         |    TK_DEFAULT TK_DOS_PUNTOS CONT_CASE {$$ = new Default($3,this._$.first_line,this._$.first_column);}
+         |    TK_DEFAULT TK_DOS_PUNTOS {$$ = new Default([],this._$.first_line,this._$.first_column);}
 ;
 
 CONT_CASE     :    CONT_CONTROL { $$ = $1;}
@@ -353,19 +350,19 @@ CONT_CASE     :    CONT_CONTROL { $$ = $1;}
 /******************************************* FIN SENTENCIA SWITCH  ****************************************/
 
 /******************************************* SENTENCIA IF   ***********************************************/
-SENTENCIA_IF    :    TK_IF CONDICIONAL CONT_CONTROL{ $$ = new If(elseif,$2, $3, [],0,0);elseif = false;}
-                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE CONT_CONTROL {$$ = new If(false,$2, $3, $5,0,0);}
-                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE SENTENCIA_IF{elseif = true; $$ = new If(false,$2, $3, [$5],0,0);}
+SENTENCIA_IF    :    TK_IF CONDICIONAL CONT_CONTROL{ $$ = new If($2, $3, [],this._$.first_line,this._$.first_column);}
+                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE CONT_CONTROL {$$ = new If($2, $3, $5,this._$.first_line,this._$.first_column);}
+                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE SENTENCIA_IF{ $$ = new If($2, $3, [$5],this._$.first_line,this._$.first_column);}
 ;
 /******************************************* FIN SENTENCIA IF  ********************************************/
 
 
 /******************************************* SENTENCIA WHILE  *********************************************/
-SENTENCIA_WHILE   :   TK_WHILE CONDICIONAL CONT_CONTROL {$$ = new While($2, $3,0,0);}
+SENTENCIA_WHILE   :   TK_WHILE CONDICIONAL CONT_CONTROL {$$ = new While($2, $3,this._$.first_line,this._$.first_column);}
 ;
 /******************************************* FIN SENTENCIA WHILE  *****************************************/
 
-SENTENCIA_DO_WHILE  :  TK_DO CONT_CONTROL TK_WHILE CONDICIONAL TK_P_COMA{$$ = new Do_while($4, $2,0,0);}
+SENTENCIA_DO_WHILE  :  TK_DO CONT_CONTROL TK_WHILE CONDICIONAL TK_P_COMA{$$ = new Do_while($4, $2, this._$.first_line,this._$.first_column);}
 ;
 
 /************************ CONDICIONAL PARA DIVERSAS SENTENCIAS  *******************************************/
@@ -382,7 +379,7 @@ CONT_CONTROL   :   TK_LL_ABRE SENTENCIAS TK_LL_CIERRA {$$ = $2;}
 SENTENCIA_FOR   :   TK_FOR TK_P_ABRE ASING_DEC_FOR
                     TK_P_COMA EXPRESION TK_P_COMA 
                     ASIGNACION TK_P_CIERRA CONT_FOR
-                    {$$ = new For($3,$5,$7,$9,0,0);}
+                    {$$ = new For($3,$5,$7,$9, this._$.first_line,this._$.first_column);}
 ;
 
 CONT_FOR    :    TK_LL_ABRE TK_LL_CIERRA{$$ = [];}
@@ -395,14 +392,14 @@ ASING_DEC_FOR   :    TK_LET DECLARACION {$2.tipo_declaracion = $1; $$ = $2;}
 /*******************************************  SENTENCIA FOR  **********************************************/
 
 SENTENCIA_FOR_1   :   TK_FOR TK_P_ABRE TK_LET TK_ID TIPO_FOR_1 TK_ID TK_P_CIERRA CONT_FOR
-                   {$$ = new For_1($4, $5, $6, $8,0,0);}     
+                   {$$ = new For_1($4, $5, $6, $8, this._$.first_line,this._$.first_column);}     
 ;
 TIPO_FOR_1   :   TK_IN {$$ = $1;}  
              |   TK_OF {$$ = $1;}
 ;
 
 /*******************************************  SENTENCIA IMPRIMIR  *****************************************/
-IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG CONT_IMPRIMIR TK_P_COMA {$$ = new Imprimir($4, 0, 0);}
+IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG CONT_IMPRIMIR TK_P_COMA {$$ = new Imprimir($4, this._$.first_line, this._$.first_column);}
 ;   
 
 CONT_IMPRIMIR   :    TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}
@@ -421,7 +418,7 @@ TIPO    :   TK_NUMBER   { $$ = new Tipo(tipos.NUMBER);}
 LLAMADA_FUNCION    :   LLAMADA_FUNCION_EXP TK_P_COMA {$$ = $1;}
 ;
 
-LLAMADA_FUNCION_EXP    :    TK_ID CONT_LLAMADA  {$$ = new Llamada_funcion($1,$2, 0,0);}
+LLAMADA_FUNCION_EXP    :    TK_ID CONT_LLAMADA  {$$ = new Llamada_funcion($1,$2, this._$.first_line,this._$.first_column);}
 ;      
 
 CONT_LLAMADA    :    TK_P_ABRE TK_P_CIERRA {$$ = [];}
@@ -431,34 +428,35 @@ LISTA_CONT_LLAMADA   :   LISTA_CONT_LLAMADA TK_COMA EXPRESION {$$ = $1; $$.push(
                      |   EXPRESION { $$ = [$1];}
 ;
 
-INC_DEC    :    TK_ID TK_MAS_MAS {$$ = new Aritmetica(new Identificador($1,0, 0),
-                        new Primitivo(new Tipo(tipos.NUMBER), 1,0,0),"+",0,0);}
-                |    TK_ID TK_MENOS_MENOS  {$$ = new Aritmetica(new Identificador($1,0, 0),
-                        new Primitivo(new Tipo(tipos.NUMBER), 1,0,0),"-",0,0);}
+INC_DEC    :    TK_ID TK_MAS_MAS {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
+                        new Primitivo(new Tipo(tipos.NUMBER), 1,this._$.first_line,this._$.first_column),"+",this._$.first_line,this._$.first_column);}
+                |    TK_ID TK_MENOS_MENOS  {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
+                        new Primitivo(new Tipo(tipos.NUMBER), 1,this._$.first_line,this._$.first_column),"-",this._$.first_line,this._$.first_column);}
 ;                 
  
-SENT_INC_DEC    :  INC_DEC {$$ = new Asignacion($1.nodo_izquierdo.id,$1,0,0);}
+SENT_INC_DEC    :  INC_DEC {$$ = new Asignacion($1.nodo_izquierdo.id,$1,this._$.first_line,this._$.first_column);}
 ;
-EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}
-            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
-            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
-            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, _$.first_line, _$.first_column);}    
-            |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}                
-            |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
-            |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
-            |   EXPRESION TK_MENOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
-            |   EXPRESION TK_IGUAL_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}    
-            |   EXPRESION TK_DISTINTO EXPRESION {$$ = new Relacional($1,$3,$2,0,0);}
-            |   EXPRESION TK_AND EXPRESION {$$ = new Logica($1,$3,$2,0,0);}
-            |   EXPRESION TK_OR EXPRESION {$$ = new Logica($1,$3,$2,0,0);}
-            |   TK_NOT EXPRESION {$$ = new Logica($2,null,$1,0,0);}
+EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}
+            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
+            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
+            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
+            |   TK_MENOS EXPRESION 
+            |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}                
+            |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
+            |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
+            |   EXPRESION TK_MENOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
+            |   EXPRESION TK_IGUAL_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
+            |   EXPRESION TK_DISTINTO EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}
+            |   EXPRESION TK_AND EXPRESION {$$ = new Logica($1,$3,$2,this._$.first_line,this._$.first_column);}
+            |   EXPRESION TK_OR EXPRESION {$$ = new Logica($1,$3,$2,this._$.first_line,this._$.first_column);}
+            |   TK_NOT EXPRESION {$$ = new Logica($2,null,$1,this._$.first_line,this._$.first_column);}
             |   EXPRESION TK_INTERROGACION EXPRESION TK_DOS_PUNTOS EXPRESION
-                        { $$ = new Ternario(new Tipo(tipos.BOOLEAN),$1,$3,$5);}
-            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),_$.first_line, _$.first_column);}
-            |   TK_NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),_$.first_line, _$.first_column);}        
-            |   TK_TRUE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,_$.first_line, _$.first_column);}        
-            |   TK_FALSE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,_$.first_line, _$.first_column);}        
-            |   TK_ID       { $$ = new Identificador($1, _$.first_line, _$.first_column); }
+                        { $$ = new Ternario(new Tipo(tipos.BOOLEAN),$1,$3,$5,this._$.first_line,this._$.first_column);}
+            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),this._$.first_line, this._$.first_column);}
+            |   TK_NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),this._$.first_line, this._$.first_column);}        
+            |   TK_TRUE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,this._$.first_line, this._$.first_column);}        
+            |   TK_FALSE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,this._$.first_line, this._$.first_column);}        
+            |   TK_ID       { $$ = new Identificador($1, this._$.first_line, this._$.first_column); }
             |   LLAMADA_FUNCION_EXP {$$  = $1;}
             |   INC_DEC {$$ = $1;}
             |   TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}         

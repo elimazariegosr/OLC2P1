@@ -3,16 +3,17 @@ import {Tipo} from './Tipo';
 class Simbolo{
     tipo: Tipo;
     id: string;
-   /* ambito: string;
-    funcion: string;*/
+    linea: number;
+    columna: number;
     valor: Object;
+    ambito: string;
   
-    constructor(tipo: Tipo, id: string, valor: Object/*, ambito: string, funcion: string*/) {
+    constructor(tipo: Tipo, id: string, valor: Object, linea: number, columna: number) {
         this.tipo = tipo;
         this.id = id;
-        this.valor = valor;/*
-        this.ambito = ambito;
-        this.funcion = funcion;*/
+        this.valor = valor;
+        this.linea = linea;
+        this.columna = columna;
     }
 }
 

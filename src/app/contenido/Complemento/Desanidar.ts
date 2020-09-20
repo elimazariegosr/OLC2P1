@@ -205,13 +205,12 @@ class Desanidar{
     expresion(exp:Object){
         let val = "";
         if(exp instanceof Logica || exp instanceof Relacional || exp instanceof Aritmetica){
-            if(exp.nodo_derecho != null){
+             if(exp.nodo_derecho != null){
                     val += this.expresion(exp.nodo_izquierdo) + " " +exp.operador + " "+ 
                      this.expresion(exp.nodo_derecho);;
             }else{
                    val += exp.operador + this.expresion(exp.nodo_izquierdo); 
-            }
-                    
+            }                  
         }else if(exp instanceof Primitivo){
             let temp;
             if(exp.tipo.type == tipos.STRING){
