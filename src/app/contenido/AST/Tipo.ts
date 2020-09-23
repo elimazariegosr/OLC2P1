@@ -27,5 +27,5 @@ class Tipo{
         }
     }
 }
-
+    
 export {tipos, Tipo};

@@ -57,9 +57,6 @@ export class ContenidoComponent implements OnInit {
       if(!this.desanidacion.hay_anidada(this.arbol)){
         //EJECUCION
         this.tabla = new Tabla(null);
-        if (document.getElementById("grafo")) {
-          document.getElementById("grafo").remove();
-        }
         this.arbol = parser.parse(entrada);
         this.arbol.instrucciones.map((m: any) =>{
           if(m instanceof Funcion){
@@ -92,6 +89,7 @@ export class ContenidoComponent implements OnInit {
       this.arbol = parser.parse(entrada);     
       let resultado = this.desanidacion.desanidar(this.arbol);
       document.getElementById('txt_traduccion').innerHTML = resultado;
+      this.reporte_ast();
    
   }
 
@@ -103,15 +101,23 @@ export class ContenidoComponent implements OnInit {
     }else if(sent instanceof Asignacion){
       return this.asignacion_ast(sent);
     }else if(sent instanceof Break){
+      return new Nodo_AST("Break",null,[]);
     }else if(sent instanceof Continue){
+      return new Nodo_AST("Continue",null,[]);
     }else if(sent instanceof Return){
+      return this.return_ast(sent);
     }else if(sent instanceof While){
       return this.while_ast(sent);
     }else if(sent instanceof Do_while){
     }else if(sent instanceof For){
+      return this.for_ast(sent);
     }else if(sent instanceof For_1){
     }else if(sent instanceof Imprimir){
+      return this.imprimir_ast(sent);
     }else if(sent instanceof Llamada_funcion){
+      return this.llamada_funcion_ast(sent);
+    }else if(sent instanceof Funcion){
+      return this.funcion_ast(sent);
     } 
   }
   if_ast(sent:If):any{
@@ -142,14 +148,34 @@ export class ContenidoComponent implements OnInit {
   }
 
   declaracion_ast(sent: Declaracion){
-    let padre = new Nodo_AST("Declaracion " + sent.id, null,[]); 
-    padre.children.push(this.ast(sent.valor)); 
+    let padre = new Nodo_AST("Declaracion", null,[]);
+    padre.children.push(this.tipo_ast("Tipo declaracion", sent.tipo_declaracion));
+    padre.children.push(this.tipo_ast("Identificador", sent.id));
+    padre.children.push(this.tipo_ast("Tipo de dato", sent.tipo));
+    if(sent.valor != null){
+      let valor =  new Nodo_AST("Valor", padre, [this.ast(sent.valor)]);
+      padre.children.push(valor);
+    }
     return padre;
   }
+
   asignacion_ast(sent: Asignacion){
-    let padre = new Nodo_AST("Asignacion " + sent.id, null,[]); 
-    padre.children.push(this.ast(sent.valor)); 
+    let padre = new Nodo_AST("Asignacion ", null,[]); 
+    padre.children.push(this.tipo_ast("Identificador", sent.id));
+    let valor =  new Nodo_AST("Valor", padre, [this.ast(sent.valor)]);
+    padre.children.push(valor);
     return padre; 
+  }
+
+  imprimir_ast(sent: Imprimir){
+    let padre = new Nodo_AST("Imprimir ", null,[]); 
+    padre.children.push(this.ast(sent.expresion)); 
+    return padre;
+  }
+  return_ast(sent: Return){
+    let padre = new Nodo_AST("Return ", null,[]); 
+    padre.children.push(this.ast(sent.condicion)); 
+    return padre;
   }
   
   llamada_funcion_ast(sent: Llamada_funcion){
@@ -159,9 +185,55 @@ export class ContenidoComponent implements OnInit {
       });
       return padre;
   }
+  funcion_ast(sent: Funcion){
+    let padre =  new Nodo_AST("Funcion ", null, []);
+    padre.children.push(this.tipo_ast("Identificador", sent.nombre));
+    
+    if(sent.parametros.length > 0){
+      let parametros = new Nodo_AST("Parametros ", padre, []);
+      sent.parametros.forEach(element => {
+        parametros.children.push(this.sentencias_ast(element));
+      });
+      padre.children.push(parametros);  
+    }
+    padre.children.push(this.tipo_ast("Tipo", sent.tipo));
+    
+    if(sent.contenido.length > 0){
+      let contenido = new Nodo_AST("Contenido", padre,[]);
+      sent.contenido.forEach(element => {
+        contenido.children.push(this.sentencias_ast(element));
+      });
+      padre.children.push(contenido);  
+    }
+    
+    return padre;
+  }
 
+  for_ast(sent: For){
+    let padre =  new Nodo_AST("For" , null, []);
+    let exp1 = new Nodo_AST("Expresion 1", padre,[]);
+    let exp2 = new Nodo_AST("Expresion 2", padre,[]);
+    let exp3 = new Nodo_AST("Expresion 3", padre,[]);
+    let contenido = new Nodo_AST("Contenido", padre,[]);
+   
+    exp1.children.push(this.sentencias_ast(sent.exp1));
+    exp2.children.push(this.ast(sent.exp2));
+    exp3.children.push(this.sentencias_ast(sent.exp3));
 
-  
+    sent.contenido.forEach(element => {
+      contenido.children.push(this.sentencias_ast(element));
+    });
+    padre.children = [exp1, exp2, exp3, contenido];
+    return padre;
+  }
+
+  for_1_ast(sent: For_1){
+    
+  }
+
+  do_while_ast(sent: Do_while){
+
+  }
 
   ast(element):any{
     let exp = new Nodo_AST("E",null,[]);
@@ -195,7 +267,15 @@ export class ContenidoComponent implements OnInit {
     return exp;
   }
 
+  tipo_ast(tipo, valor){
+    return new Nodo_AST(tipo, null,[new Nodo_AST(valor, null, [])]);
+  }
+
   reporte_ast(){
+    if (document.getElementById("grafo")) {
+      document.getElementById("grafo").remove();
+    }
+   
     let raiz = new Nodo_AST("Raiz",null,[]);  
     this.arbol.instrucciones.forEach(element => {
       raiz.children.push(this.sentencias_ast(element));      

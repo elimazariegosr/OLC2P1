@@ -47,7 +47,7 @@ class If extends Nodo {
                 }
                 
                 const cont = this.lista_if[i].ejecutar(nueva_tabla, arbol);
-                    if(cont instanceof Return){
+                if(cont instanceof Return){
                     return cont;
                 }
                 if(cont instanceof Continue || cont instanceof Break){

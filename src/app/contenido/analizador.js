@@ -99,22 +99,19 @@ case 5: case 11: case 76: case 92: case 94: case 112:
 this.$ = [];
 break;
 case 6:
- this.$ = $$[$0-1]; this.$ = agregar_vars($$[$0], this.$);
+ this.$ = $$[$0-1]; this.$ = unir_listas($$[$0], this.$);
 break;
 case 7:
-this.$ = []; this.$ = agregar_vars($$[$0], this.$);
+this.$ = []; this.$ = unir_listas($$[$0], this.$);
 break;
-case 8:
-this.$ = ["sent",$$[$0]];
+case 8: case 19: case 52: case 84: case 97: case 99: case 100: case 140:
+this.$ = $$[$0];
 break;
-case 9:
-this.$ = ["",$$[$0]];
+case 9: case 13: case 18: case 20: case 21: case 22: case 23: case 24: case 25: case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 42: case 70: case 72: case 78:
+this.$ = [$$[$0]];
 break;
 case 12: case 41:
  this.$ = $$[$0-2]; this.$.push($$[$0]);
-break;
-case 13: case 18: case 20: case 21: case 22: case 23: case 24: case 25: case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 42: case 70: case 72: case 78:
-this.$ = [$$[$0]];
 break;
 case 14:
  this.$ = new Declaracion("let",null, $$[$0], null, this._$.first_line,this._$.first_column);
@@ -127,9 +124,6 @@ case 16:
 break;
 case 17:
 this.$ = []; this.$ = unir_listas($$[$0],this.$);
-break;
-case 19: case 52: case 84: case 97: case 99: case 100: case 140:
-this.$ = $$[$0];
 break;
 case 26:
   this.$ = [$$[$0]];
@@ -808,153 +802,153 @@ options: {"ranges":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:/* skip comments */
+case 0:/* */
 break;
-case 1:this.begin('comment');
+case 1:/* */
 break;
-case 2:this.popState();
+case 2:/* skip whitespace */
 break;
-case 3:/* skip comment content*/
+case 3:/* */
 break;
-case 4:/* skip whitespace */
+case 4:return 90;
 break;
-case 5:return 90;
+case 5:return 89;
 break;
-case 6:return 89;
+case 6:return 92;
 break;
-case 7:return 92;
+case 7:return 91;
 break;
-case 8:return 91;
+case 8:return 'TK_VAR';
 break;
-case 9:return 'TK_VAR';
+case 9:return 49;
 break;
-case 10:return 49;
+case 10:return 50;
 break;
-case 11:return 50;
+case 11:return 93;
 break;
-case 12:return 93;
+case 12:return 60;
 break;
-case 13:return 60;
+case 13:return 'TK_ARRAY';
 break;
-case 14:return 'TK_ARRAY';
+case 14:return 'TK_PUSH';
 break;
-case 15:return 'TK_PUSH';
+case 15:return 'TK_POP';
 break;
-case 16:return 'TK_POP';
+case 16:return 'TK_LENGTH';
 break;
-case 17:return 'TK_LENGTH';
+case 17:return 76;
 break;
-case 18:return 76;
+case 18:return 77;
 break;
-case 19:return 77;
+case 19:return 67;
 break;
-case 20:return 67;
+case 20:return 72;
 break;
-case 21:return 72;
+case 21:return 74;
 break;
-case 22:return 74;
+case 22:return 80;
 break;
-case 23:return 80;
+case 23:return 85;
 break;
-case 24:return 85;
+case 24:return 84;
 break;
-case 25:return 84;
+case 25:return 78;
 break;
-case 26:return 78;
+case 26:return 79;
 break;
-case 27:return 79;
+case 27:return 43;
 break;
-case 28:return 43;
+case 28:return 44;
 break;
-case 29:return 44;
+case 29:return 40;
 break;
-case 30:return 40;
+case 30:return 7;
 break;
-case 31:return 7;
+case 31:return 86;
 break;
-case 32:return 86;
+case 32:return 87;
 break;
-case 33:return 87;
+case 33:return 116;
 break;
-case 34:return 116;
+case 34:return 117;
 break;
-case 35:return 117;
+case 35:return 13; 
 break;
-case 36:return 13; 
+case 36:return 15;
 break;
-case 37:return 15;
+case 37:return 17;
 break;
-case 38:return 17;
+case 38:return 19;
 break;
-case 39:return 19;
+case 39:return 54;
 break;
-case 40:return 54;
+case 40:return 59;
 break;
-case 41:return 59;
+case 41:return 20;
 break;
-case 42:return 20;
+case 42:return 113;
 break;
-case 43:return 113;
+case 43:return 11;
 break;
-case 44:return 11;
+case 44:return 41;
 break;
-case 45:return 41;
+case 45:return 107;
 break;
-case 46:return 107;
+case 46:return 105;
 break;
-case 47:return 105;
+case 47:return 108;
 break;
-case 48:return 108;
+case 48:return 106;
 break;
-case 49:return 106;
+case 49:return 104;
 break;
-case 50:return 104;
+case 50:return 109;
 break;
-case 51:return 109;
+case 51:return 111;
 break;
-case 52:return 111;
+case 52:return 110;
 break;
-case 53:return 110;
+case 53:return 112;
 break;
-case 54:return 112;
+case 54:return 48;
 break;
-case 55:return 48;
+case 55:return 'TK_MAS_IGUAL';
 break;
-case 56:return 'TK_MAS_IGUAL';
+case 56:return 'TK_MENOS_IGUAL';
 break;
-case 57:return 'TK_MENOS_IGUAL';
+case 57:return 'TK_MULTI_IGUAL';
 break;
-case 58:return 'TK_MULTI_IGUAL';
+case 58:return 'TK_DIV_IGUAL';
 break;
-case 59:return 'TK_DIV_IGUAL';
+case 59:return 'TK_MOD_IGUAL';
 break;
-case 60:return 'TK_MOD_IGUAL';
+case 60:return 98;
 break;
-case 61:return 98;
+case 61:return 100;
 break;
-case 62:return 100;
+case 62:return 99;
 break;
-case 63:return 99;
+case 63:return 101;
 break;
-case 64:return 101;
+case 64:return 102;
 break;
-case 65:return 102;
+case 65:return 103;
 break;
-case 66:return 103;
+case 66:return 'TK_MOD';
 break;
-case 67:return 'TK_MOD';
+case 67:return 'TK_ELEVADO';
 break;
-case 68:return 'TK_ELEVADO';
+case 68:return 65;
 break;
-case 69:return 65;
+case 69:return 'TK_NULO';
 break;
-case 70:return 'TK_NULO';
+case 70:return 8; /* Varying form */
 break;
-case 71:return 8; /* Varying form */
+case 71:return 115;
 break;
 case 72:return 115;
 break;
-case 73:return 115;
+case 73:return 114;
 break;
 case 74:return 114;
 break;
@@ -962,16 +956,14 @@ case 75:return 114;
 break;
 case 76:return 114;
 break;
-case 77:return 114;
+case 77:return 5;
 break;
-case 78:return 5;
-break;
-case 79:
+case 78:
 break;
 }
 },
-rules: [/^(?:\/\/.*)/,/^(?:\/\*)/,/^(?:\*\/)/,/^(?:.)/,/^(?:\s+)/,/^(?:string\b)/,/^(?:number\b)/,/^(?:boolean\b)/,/^(?:void\b)/,/^(?:var\b)/,/^(?:let\b)/,/^(?:const\b)/,/^(?:any\b)/,/^(?:type\b)/,/^(?:Array\b)/,/^(?:push\b)/,/^(?:pop\b)/,/^(?:length\b)/,/^(?:if\b)/,/^(?:else\b)/,/^(?:switch\b)/,/^(?:case\b)/,/^(?:default\b)/,/^(?:for\b)/,/^(?:of\b)/,/^(?:in\b)/,/^(?:while\b)/,/^(?:do\b)/,/^(?:break\b)/,/^(?:continue\b)/,/^(?:return\b)/,/^(?:function\b)/,/^(?:console\b)/,/^(?:log\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:\{)/,/^(?:\})/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:,)/,/^(?:\?)/,/^(?::)/,/^(?:;)/,/^(?:<=)/,/^(?:<)/,/^(?:==)/,/^(?:>=)/,/^(?:>)/,/^(?:!=)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:!)/,/^(?:=)/,/^(?:\+=)/,/^(?:-=)/,/^(?:\*=)/,/^(?:\/=)/,/^(?:%=)/,/^(?:\+\+)/,/^(?:\+)/,/^(?:--)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:\^)/,/^(?:\.)/,/^(?:null\b)/,/^(?:[_a-zA-Z][a-zA-Z0-9_]*)/,/^(?:(((0|([1-9])([0-9])*))\.((0|([1-9])([0-9])*))+))/,/^(?:((0|([1-9])([0-9])*)))/,/^(?:"")/,/^(?:"([^"]|(\\.))*")/,/^(?:\\'\\')/,/^(?:\\'([^']|(\\.))*\\')/,/^(?:$)/,/^(?:.)/],
-conditions: {"comment":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79],"inclusive":true},"INITIAL":{"rules":[0,1,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79],"inclusive":true}}
+rules: [/^(?:((\/\*)[^\*\/]*(\*\/)))/,/^(?:[ \\\t\r\n\f])/,/^(?:\s+)/,/^(?:(\/\/[^\n]*))/,/^(?:string\b)/,/^(?:number\b)/,/^(?:boolean\b)/,/^(?:void\b)/,/^(?:var\b)/,/^(?:let\b)/,/^(?:const\b)/,/^(?:any\b)/,/^(?:type\b)/,/^(?:Array\b)/,/^(?:push\b)/,/^(?:pop\b)/,/^(?:length\b)/,/^(?:if\b)/,/^(?:else\b)/,/^(?:switch\b)/,/^(?:case\b)/,/^(?:default\b)/,/^(?:for\b)/,/^(?:of\b)/,/^(?:in\b)/,/^(?:while\b)/,/^(?:do\b)/,/^(?:break\b)/,/^(?:continue\b)/,/^(?:return\b)/,/^(?:function\b)/,/^(?:console\b)/,/^(?:log\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:\{)/,/^(?:\})/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:,)/,/^(?:\?)/,/^(?::)/,/^(?:;)/,/^(?:<=)/,/^(?:<)/,/^(?:==)/,/^(?:>=)/,/^(?:>)/,/^(?:!=)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:!)/,/^(?:=)/,/^(?:\+=)/,/^(?:-=)/,/^(?:\*=)/,/^(?:\/=)/,/^(?:%=)/,/^(?:\+\+)/,/^(?:\+)/,/^(?:--)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:\^)/,/^(?:\.)/,/^(?:null\b)/,/^(?:[_a-zA-Z][a-zA-Z0-9_]*)/,/^(?:(((0|([1-9])([0-9])*))\.((0|([1-9])([0-9])*))+))/,/^(?:((0|([1-9])([0-9])*)))/,/^(?:"")/,/^(?:"([^"]|(\\.))*")/,/^(?:\\'\\')/,/^(?:\\'([^']|(\\.))*\\')/,/^(?:$)/,/^(?:.)/],
+conditions: {"comment":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78],"inclusive":true}}
 });
 return lexer;
 })();

@@ -37,7 +37,7 @@ class Funcion extends Nodo{
     guardar_funcion(tabla: Tabla, arbol:Arbol){
         let simbolo: Simbolo;
         simbolo = new Simbolo(this.tipo, this.id, this, this.linea, this.columna);
-        const resp = tabla.set_var(simbolo);
+        const resp = tabla.set_variable(simbolo);
         if(resp != null){
             const error = new Errror('Semantico',"Ya esta declarada la funcion", this.linea, this.columna);
             arbol.errores.push(error);
@@ -47,6 +47,11 @@ class Funcion extends Nodo{
 
     generar_id(){
         this.id = "funcion#_" + this.nombre;
+    }
+    
+    entorno(aux:Tabla){
+        while(aux.t_anterior!=null){aux=aux.t_anterior;}
+        return aux;
     }
     
     ejecutar(tabla: Tabla, arbol: Arbol):Object{

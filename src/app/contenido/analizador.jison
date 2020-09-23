@@ -50,12 +50,10 @@ BSL               "\\".
 %%
 
 
-"//".*                /* skip comments */
-"/*"                  this.begin('comment');
-<comment>"*/"         this.popState();
-<comment>.            /* skip comment content*/
+((\/\*)[^\*\/]*(\*\/))          /* */
+[ \\\t\r\n\f]              /* */
 \s+                   /* skip whitespace */
-
+(\/\/[^\n]*)            /* */
 
 
 "string"                return 'TK_STRING';
@@ -188,12 +186,12 @@ CONT_FUNCION    :    TK_LL_ABRE LISTA_CONT_FUNCION TK_LL_CIERRA {$$ = $2;}
                 |    TK_LL_ABRE TK_LL_CIERRA {$$ = [];}
 ;
 
-LISTA_CONT_FUNCION    :    LISTA_CONT_FUNCION  CONT_BLOQUE_FUNCION { $$ = $1; $$ = agregar_vars($2, $$);}
-                      |    CONT_BLOQUE_FUNCION  {$$ = []; $$ = agregar_vars($1, $$);}   
+LISTA_CONT_FUNCION    :    LISTA_CONT_FUNCION  CONT_BLOQUE_FUNCION { $$ = $1; $$ = unir_listas($2, $$);}
+                      |    CONT_BLOQUE_FUNCION  {$$ = []; $$ = unir_listas($1, $$);}   
 ;
 
-CONT_BLOQUE_FUNCION     :     SENTENCIAS {$$ = ["sent",$1];}
-                        |     FUNCION  {$$ = ["",$1];}
+CONT_BLOQUE_FUNCION     :     SENTENCIAS {$$ = $1;}
+                        |     FUNCION  {$$ = [$1];}
 ;
 
 PARAMETROS   :   TK_P_ABRE LISTA_PARAMETROS TK_P_CIERRA {$$ = $2;}
