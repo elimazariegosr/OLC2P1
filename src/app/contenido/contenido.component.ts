@@ -226,7 +226,7 @@ export class ContenidoComponent implements OnInit {
     return padre;
   }
   case_ast(sent: Case){
-    let padre =  new Nodo_AST("CASE" , null, []);
+    let padre =  new Nodo_AST("Case" , null, []);
     let exp1 = new Nodo_AST("Expresion", padre,[]);
     exp1.children.push(this.ast(sent.expresion));
     let contenido = new Nodo_AST("Contenido", padre,[]);
@@ -237,7 +237,7 @@ export class ContenidoComponent implements OnInit {
     return padre;
   }
   default_ast(sent: Default){
-    let padre =  new Nodo_AST("CASE" , null, []);
+    let padre =  new Nodo_AST("Default" , null, []);
     let contenido = new Nodo_AST("Contenido", padre,[]);
     sent.contenido.forEach(element => {
       contenido.children.push(this.sentencias_ast(element));
