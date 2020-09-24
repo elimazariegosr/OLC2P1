@@ -21,15 +21,8 @@ class Case extends Nodo{
     ejecutar(tabla: Tabla, arbol:Arbol){
         const nueva_tabla = new Tabla(tabla);
         for(let i = 0; i <  this.contenido.length; i++){
-            if(this.contenido[i] instanceof Return){
-                return this.contenido[i];
-            }
-            
             const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                if(cont instanceof Return){
-                return cont;
-            }
-            if(cont instanceof Continue || cont instanceof Break){
+            if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
                 return cont;
             }
         }

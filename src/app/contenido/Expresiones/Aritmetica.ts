@@ -93,6 +93,32 @@ class Aritmetica extends Nodo{
                     arbol.consola.push(error.desc);
                     return error;
                 }
+            }else if(this.operador == '**'){
+                if(this.nodo_izquierdo.tipo.type == tipos.NUMBER && 
+                    this.nodo_derecho.tipo.type == tipos.NUMBER){
+                
+                    this.tipo = new Tipo(tipos.NUMBER);
+                    return resultado_izq ** resultado_der;        
+
+                }else{
+                    const error = new Errror("Semantico","Error al operar con ** ", this.linea, this.columna);
+                    arbol.errores.push(error);
+                    arbol.consola.push(error.desc);
+                    return error;
+                }
+            }else if(this.operador == '%'){
+                if(this.nodo_izquierdo.tipo.type == tipos.NUMBER && 
+                    this.nodo_derecho.tipo.type == tipos.NUMBER){
+                
+                    this.tipo = new Tipo(tipos.NUMBER);
+                    return resultado_izq % resultado_der;        
+
+                }else{
+                    const error = new Errror("Semantico","Error al operar con % ", this.linea, this.columna);
+                    arbol.errores.push(error);
+                    arbol.consola.push(error.desc);
+                    return error;
+                }
             }
         }else{
             const resultado_izq = this.nodo_izquierdo.ejecutar(tabla, arbol);

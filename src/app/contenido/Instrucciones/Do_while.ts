@@ -40,21 +40,14 @@ class Do_while extends Nodo{
                     arbol.errores.push(error);
                     arbol.consola.push(error.toString());
                     return error;        
-              }
-                for (let i = 0; i < this.contenido.length; i++) {
-                    if(this.contenido[i] instanceof Return){
-                        return this.contenido[i];
-                    }
-                    
-                    const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                        if(cont instanceof Return){
-                        return cont;
-                    }
-                    if(cont instanceof Continue || cont instanceof Break){
-                        return cont;
-                    }
+            }
+            for (let i = 0; i < this.contenido.length; i++) {
+                const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
+                if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                    return cont;
                 }
-            
+            }
+    
             contador++;
             nueva_tabla = new Tabla(tabla);
         } while (res && contador < 999999999);

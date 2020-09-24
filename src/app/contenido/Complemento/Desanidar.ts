@@ -10,7 +10,9 @@ import { Primitivo } from '../Expresiones/Primitivo';
 import { Relacional } from '../Expresiones/Relacional';
 import { Return } from '../Expresiones/Return';
 import { Asignacion } from '../Instrucciones/Asignacion';
+import { Case } from '../Instrucciones/Case';
 import { Declaracion } from '../Instrucciones/Declaracion';
+import { Default } from '../Instrucciones/Default';
 import { Do_while } from '../Instrucciones/Do_while';
 import { For } from '../Instrucciones/For';
 import { For_1 } from '../Instrucciones/For_1';
@@ -19,6 +21,7 @@ import { Identificador } from '../Instrucciones/Identificador';
 import { If } from '../Instrucciones/If';
 import { Imprimir } from '../Instrucciones/Imprimir';
 import { Llamada_funcion } from '../Instrucciones/Llamada_funcion';
+import { Switch } from '../Instrucciones/Switch';
 import { While } from '../Instrucciones/While';
 class Desanidar{
 
@@ -106,6 +109,8 @@ class Desanidar{
             cont = this.sent_while(sent, tab);
         }else if(sent instanceof Do_while){
             cont = this.sent_do_while(sent, tab);
+        }else if(sent instanceof Switch){
+            cont = this.sent_switch(sent, tab);
         }else if(sent instanceof For){
             cont = this.sent_for(sent, tab);
         }else if(sent instanceof For_1){
@@ -201,13 +206,40 @@ class Desanidar{
         return cont  + "\n" + tab + "}while(" + this.expresion(sent.condicion) + ");"; 
         
     }
+    sent_switch(sent: Switch, tab){
+        let cont = tab + "switch(" + this.expresion(sent.expresion) + "){";
+        sent.contenido.forEach(element => {
+            if(element instanceof Case){
+                cont += "\n" + this.sent_case(element, tab + "  "); 
+            }
+            if(element instanceof Default){
+                cont += "\n" + this.sent_default(element, tab + "  "); 
+            }
+        });
+        return cont + "\n" + tab + "}";     
+    }
+    
+    sent_case(sent: Case, tab){
+        let cont = tab + "case " + this.expresion(sent.expresion) + " :";
+        sent.contenido.forEach(element => {
+            cont += "\n" + tab  + this.sentencias(element, tab + "  ");
+        });
+        return cont;
+    }
+    sent_default(sent: Default, tab){
+        let cont = tab + "default :";
+        sent.contenido.forEach(element => {
+            cont += "\n" + tab + this.sentencias(element, tab + "  ");
+        });   
+        return cont;
+    }
     
     expresion(exp:Object){
         let val = "";
         if(exp instanceof Logica || exp instanceof Relacional || exp instanceof Aritmetica){
              if(exp.nodo_derecho != null){
                     val += this.expresion(exp.nodo_izquierdo) + " " +exp.operador + " "+ 
-                     this.expresion(exp.nodo_derecho);;
+                     this.expresion(exp.nodo_derecho);
             }else{
                    val += exp.operador + this.expresion(exp.nodo_izquierdo); 
             }                  

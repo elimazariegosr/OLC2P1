@@ -137,7 +137,7 @@ BSL               "\\".
 "*"                   return 'TK_MULTI';
 "/"                   return 'TK_DIV';
 "%"                   return 'TK_MOD';
-"^"                   return 'TK_ELEVADO';
+"**"                   return 'TK_ELEVADO';
 
 "."                   return 'TK_PUNTO';
 
@@ -223,7 +223,7 @@ CONT_SENTENCIAS   :   IMPRIMIR {$$ = [$1];}
                   |   RETURN {  $$ = [$1];}
                   |   SENTENCIA_FOR{$$ = [$1];}  
                   |   SENTENCIA_FOR_1 {$$ = [$1];}  
-                  |   SENT_INC_DEC {$$ = [$1];}
+                  |   SENT_INC_DEC TK_P_COMA {$$ = [$1];}
                   |   SENTENCIA_SWITCH {$$ = [$1];}
                   |   BREAK {$$ = [$1];}
                   |   CONTINUE {$$ = [$1];}
@@ -438,7 +438,9 @@ EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._
             |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
             |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
             |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   TK_MENOS EXPRESION 
+            |   EXPRESION TK_ELEVADO EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
+            |   EXPRESION TK_MOD EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
+            |   TK_MENOS EXPRESION {$$ = new Aritmetica($2,null,$1, this._$.first_line, _$.first_column);}
             |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}                
             |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
             |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    

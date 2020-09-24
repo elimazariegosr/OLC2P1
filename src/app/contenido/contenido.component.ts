@@ -109,6 +109,8 @@ export class ContenidoComponent implements OnInit {
     }else if(sent instanceof While){
       return this.while_ast(sent);
     }else if(sent instanceof Do_while){
+    }else if(sent instanceof Switch){
+      return this.switch_ast(sent);
     }else if(sent instanceof For){
       return this.for_ast(sent);
     }else if(sent instanceof For_1){
@@ -209,6 +211,41 @@ export class ContenidoComponent implements OnInit {
     return padre;
   }
 
+  switch_ast(sent: Switch){
+    let padre =  new Nodo_AST("Switch" , null, []);
+    let exp1 = new Nodo_AST("Expresion", padre,[]);
+    exp1.children.push(this.ast(sent.expresion));
+
+    sent.contenido.forEach(element => {
+      if(element instanceof Case){
+          padre.children.push(this.case_ast(element));
+      }else if(element instanceof Default){
+        padre.children.push(this.default_ast(element));
+      }
+    });
+    return padre;
+  }
+  case_ast(sent: Case){
+    let padre =  new Nodo_AST("CASE" , null, []);
+    let exp1 = new Nodo_AST("Expresion", padre,[]);
+    exp1.children.push(this.ast(sent.expresion));
+    let contenido = new Nodo_AST("Contenido", padre,[]);
+    sent.contenido.forEach(element => {
+      contenido.children.push(this.sentencias_ast(element));
+    });
+    padre.children = [exp1, contenido];
+    return padre;
+  }
+  default_ast(sent: Default){
+    let padre =  new Nodo_AST("CASE" , null, []);
+    let contenido = new Nodo_AST("Contenido", padre,[]);
+    sent.contenido.forEach(element => {
+      contenido.children.push(this.sentencias_ast(element));
+    });
+    padre.children = [contenido];
+    return padre;
+  }
+
   for_ast(sent: For){
     let padre =  new Nodo_AST("For" , null, []);
     let exp1 = new Nodo_AST("Expresion 1", padre,[]);
@@ -238,17 +275,19 @@ export class ContenidoComponent implements OnInit {
   ast(element):any{
     let exp = new Nodo_AST("E",null,[]);
     if(element instanceof Aritmetica || element instanceof Logica || element instanceof Relacional){     
-      if(element.nodo_izquierdo != null){
+      
+      if(element.nodo_derecho != null){
           let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
           izq.parent = exp;
           exp.children.push(izq);
-        }
-        exp.children.push(new Nodo_AST(element.operador,exp,[]));
-
-        if(element.nodo_derecho != null){
+          exp.children.push(new Nodo_AST(element.operador,exp,[]));
           let der: Nodo_AST= this.ast(element.nodo_derecho);
           der.parent = exp;
           exp.children.push(der);
+      }else{
+        exp.children.push(new Nodo_AST(element.operador,exp,[]));
+        let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
+        exp.children.push(izq);          
       } 
     }else if(element instanceof Primitivo){
       let hijo = new Nodo_AST(element.valor.toString(), null, []);

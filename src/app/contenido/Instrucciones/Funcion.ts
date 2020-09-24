@@ -49,11 +49,6 @@ class Funcion extends Nodo{
         this.id = "funcion#_" + this.nombre;
     }
     
-    entorno(aux:Tabla){
-        while(aux.t_anterior!=null){aux=aux.t_anterior;}
-        return aux;
-    }
-    
     ejecutar(tabla: Tabla, arbol: Arbol):Object{
         let val = null;
         const nueva_tabla = new Tabla(tabla);
@@ -67,14 +62,18 @@ class Funcion extends Nodo{
         });
 
         for(let i = 0; i < cont_aux.length; i++){
-            if(cont_aux[i] instanceof Return){
-                val = cont_aux[i].condicion.ejecutar(nueva_tabla,arbol);
-                return val;
-           }
             let res = cont_aux[i].ejecutar(nueva_tabla,arbol);
             if(res instanceof Return){
-                val =  res.condicion.ejecutar(nueva_tabla, arbol);
-                return val;
+                if(res.tipo.type != this.tipo.type && this.tipo.type != tipos.ANY){
+                    const error = new Errror('Semantico',"El tipo de dato del return no es igual al de la funcion", this.linea, this.columna);
+                    arbol.errores.push(error);
+                    arbol.consola.push(error.toString()); 
+                    return "Undefined";    
+                }
+                if(res.valor != null){
+                    return res.valor;
+                }
+                return null;
             }
         }
         return null;

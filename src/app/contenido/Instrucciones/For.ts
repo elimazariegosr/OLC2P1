@@ -52,16 +52,9 @@ class For extends Nodo{
               }
             
             if(res){
-                for (let i = 0; i < this.contenido.length; i++) {
-                    if(this.contenido[i] instanceof Return){
-                        return this.contenido[i];
-                    }
-                    
+                for (let i = 0; i < this.contenido.length; i++) {                  
                     const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                        if(cont instanceof Return){
-                        return cont;
-                    }
-                    if(cont instanceof Continue || cont instanceof Break){
+                    if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
                         return cont;
                     }
                 }   
@@ -71,7 +64,7 @@ class For extends Nodo{
             contador++;
             nueva_tabla = new Tabla(tabla);
             this.exp3.ejecutar(nueva_tabla,arbol);
-            } while (res && contador < 1000);
+            } while (res && contador < 99999999);
  
     }
 }

@@ -82,7 +82,6 @@ class Llamada_funcion extends Nodo{
                 this.funcion.cont_parametros[i] = this.parametros[i];
             }
             let ast = this.funcion.ejecutar(tabla, arbol);
-            console.log(ast);
             return ast;
         }else{
             const error = new Errror('Semantico',
@@ -91,7 +90,6 @@ class Llamada_funcion extends Nodo{
             arbol.errores.push(error);
             arbol.consola.push(error.toString());
             return error;
-
         }
     }
 }
