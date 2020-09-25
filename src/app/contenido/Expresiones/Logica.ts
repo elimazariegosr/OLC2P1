@@ -16,9 +16,6 @@ class Logica extends Nodo{
         this.nodo_derecho = nodo_derecho;
         this.operador = operador;
     }
-    get_tipo(){
-        return this.tipo;
-    }
     ejecutar(tabla: Tabla, arbol: Arbol){
         if(this.nodo_derecho != null){
             const resultado_izq  =  this.nodo_izquierdo.ejecutar(tabla,arbol);

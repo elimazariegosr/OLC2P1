@@ -15,9 +15,6 @@ class Identificador extends Nodo{
         this.id = id;
     }
 
-    get_tipo(){
-        return this.tipo;
-    }
     ejecutar(tabla: Tabla, arbol: Arbol) {
         let variable: Simbolo;
         variable = tabla.get_var(this.id);

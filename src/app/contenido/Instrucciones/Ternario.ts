@@ -18,10 +18,6 @@ class Ternario extends Nodo{
         this.exp2 = exp2;
     }
 
-    get_tipo(){
-
-    }
-
     ejecutar(tabla: Tabla, arbol: Arbol){
         let res: Nodo;
         console.log("Cond");

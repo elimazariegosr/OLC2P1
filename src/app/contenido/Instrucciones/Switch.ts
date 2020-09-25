@@ -36,9 +36,15 @@ class Switch extends Nodo{
                 if(res == cases.expresion.ejecutar(nueva_tabla, arbol)){
                     def = false;
                     const cont = cases.ejecutar(nueva_tabla, arbol);
-                    if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                    if(cont instanceof Continue || cont instanceof Break){
+                        return null;
+                    }
+               
+                    if(cont instanceof Return){
                         return cont;
-                    }    
+                    }
+                    
+                   
                 }
             }else if(cases instanceof Default && cont_def == null){
                 cont_def = cases;
@@ -46,9 +52,13 @@ class Switch extends Nodo{
         }
         if(def == true && cont_def != null){
             const cont = cont_def.ejecutar(nueva_tabla, arbol);
-            if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+            if(cont instanceof Return){
                 return cont;
             }
+            if(cont instanceof Continue || cont instanceof Break){
+                return null;
+            }
+       
         }
         return null;
     }

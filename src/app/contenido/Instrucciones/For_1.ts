@@ -25,9 +25,6 @@ class For_1 extends Nodo{
         this.contenido = contenido;
     }
 
-    get_tipo(){
-    }
-
     ejecutar(tabla: Tabla, arbol: Arbol){
         let res = tabla.get_var(this.id);
         let fin;

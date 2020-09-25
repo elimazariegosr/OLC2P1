@@ -15,10 +15,6 @@ class Relacional extends Nodo{
         this.nodo_derecho = nodo_derecho;
         this.operador = operador;
     }
-
-    get_tipo(){
-        return this.tipo;
-    }
     ejecutar(tabla: Tabla, arbol: Arbol){
         const resultado_izq = this.nodo_izquierdo.ejecutar(tabla, arbol);
         if(resultado_izq instanceof Errror){

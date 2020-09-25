@@ -45,8 +45,11 @@ class While extends Nodo{
             if (res) {
                 for (let i = 0; i < this.contenido.length; i++) {
                     const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                    if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                    if(cont instanceof Return){
                         return cont;
+                    }
+                    if(cont instanceof Continue || cont instanceof Break){
+                        return null;
                     }
                 }
             }else{

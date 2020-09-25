@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import {Desanidar} from './Complemento/Desanidar';
 
@@ -42,27 +42,64 @@ const parser  = require('./analizador.js');
   templateUrl: './contenido.component.html',
   styleUrls: ['./contenido.component.css']
 })
+
 export class ContenidoComponent implements OnInit {
 
-  constructor() { }
+  constructor() { 
+    
+  }
 
   
   arbol:Arbol;
   tabla:Tabla;
   desanidacion = new Desanidar();
+  abierto = true;
+  @ViewChild('rep_p') id:ElementRef; 
   
-
+  mostrar_tabla(val, id){
+   this.id.nativeElement.style.display = 'block';
+   let div = "<div style=\"display: block;\">";
+    div += "<h4>Tabla #" + id + " de simbolos generada</h4>";
+    div += val;
+    div += "</div><br>"; 
+    document.getElementById("tablas").innerHTML += div ;
+    console.log("agregando tb");
+   }
+  ocultar_mod(){
+     this.id.nativeElement.style.display = 'none';
+  }
+  mostrar_errores(){}
+  mostrar_ts(){
+    let i = 1;
+    this.arbol.reportes.forEach(element => {
+      this.mostrar_tabla(element, i);
+      i++;
+    });
+  }
   ejecutar(entrada:string):void{
-      this.arbol = parser.parse(entrada);
+    
+    document.getElementById("tablas").innerHTML ="";
+           this.arbol = parser.parse(entrada);
       if(!this.desanidacion.hay_anidada(this.arbol)){
         //EJECUCION
         this.tabla = new Tabla(null);
         this.arbol = parser.parse(entrada);
-        this.arbol.instrucciones.map((m: any) =>{
-          if(m instanceof Funcion){
-              m.guardar_funcion(this.tabla, this.arbol);
-          }else{
-            const res = m.ejecutar(this.tabla, this.arbol);
+       
+        this.arbol.instrucciones.forEach(element => {
+          if(element instanceof Funcion){
+              element.guardar_funcion(this.tabla, this.arbol);
+          }
+        });
+
+        this.arbol.instrucciones.forEach(element => {
+          if(element instanceof Declaracion){
+            element.ejecutar(this.tabla, this.arbol);
+          }
+        });
+
+        this.arbol.instrucciones.forEach(element => {
+          if(!(element instanceof  Declaracion) && !(element instanceof Funcion)){
+              element.ejecutar(this.tabla, this.arbol);
           }
         });
 
@@ -109,12 +146,13 @@ export class ContenidoComponent implements OnInit {
     }else if(sent instanceof While){
       return this.while_ast(sent);
     }else if(sent instanceof Do_while){
+      return this.do_while_ast(sent);
     }else if(sent instanceof Switch){
       return this.switch_ast(sent);
     }else if(sent instanceof For){
       return this.for_ast(sent);
-    }else if(sent instanceof For_1){
-    }else if(sent instanceof Imprimir){
+    }/*else if(sent instanceof For_1){
+    }*/else if(sent instanceof Imprimir){
       return this.imprimir_ast(sent);
     }else if(sent instanceof Llamada_funcion){
       return this.llamada_funcion_ast(sent);
@@ -269,7 +307,15 @@ export class ContenidoComponent implements OnInit {
   }
 
   do_while_ast(sent: Do_while){
-
+    let padre = new Nodo_AST("Do While", null,[]); 
+    let condicion = new Nodo_AST("Condicion", padre,[]);
+    let contenido = new Nodo_AST("Contenido", padre,[]);
+    condicion.children.push(this.ast(sent.condicion));
+    sent.contenido.forEach(element => {
+      contenido.children.push(this.sentencias_ast(element));
+    });
+    padre.children = [condicion, contenido];
+    return padre; 
   }
 
   ast(element):any{

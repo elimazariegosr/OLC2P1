@@ -16,8 +16,6 @@ class Asignacion extends Nodo{
         this.valor = valor;
     }
 
-    get_tipo(){return this.tipo};
-    
     ejecutar(tabla: Tabla, arbol:Arbol){
         const res:Nodo = this.valor.ejecutar(tabla,arbol);
         if(res instanceof Errror){

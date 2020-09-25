@@ -70,9 +70,9 @@ class Aritmetica extends Nodo{
                     return resultado_izq * resultado_der;        
 
                 }else{
-                    const error = new Errror("Semantico","Error al operar con * ", this.linea, this.columna);
+                    const error = new Errror("Semantico","Error al operar con * :( ", this.linea, this.columna);
                     arbol.errores.push(error);
-                    arbol.consola.push(error.desc);
+                    arbol.consola.push(error.toString());
                     return error;
                 }
             }else if(this.operador == '/'){
@@ -88,7 +88,7 @@ class Aritmetica extends Nodo{
                     return resultado_izq / resultado_der;        
 
                 }else{
-                    const error = new Errror("Semantico","Error al operar con * ", this.linea, this.columna);
+                    const error = new Errror("Semantico","Error al operar con /", this.linea, this.columna);
                     arbol.errores.push(error);
                     arbol.consola.push(error.desc);
                     return error;

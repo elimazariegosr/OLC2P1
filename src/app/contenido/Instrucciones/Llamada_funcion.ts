@@ -14,6 +14,7 @@ class Llamada_funcion extends Nodo{
     parametros: Array<Nodo>;
     funcion: Object;
     id: string;
+    graph :string = "";
     constructor(nombre:string, parametros: Array<Nodo>, linea:number, columna:number){
         super(null,linea, columna);
         this.nombre = nombre;
@@ -46,7 +47,7 @@ class Llamada_funcion extends Nodo{
     ejecutar(tabla:Tabla, arbol:Arbol):Object{
         this.buscar_funcion(tabla);
         if(this.nombre == "graficar_ts"){
-            this.graficar_ts(tabla);
+           this.graficar_ts(tabla, arbol);
         } else if(this.funcion instanceof Funcion){
             if(this.funcion.parametros.length != this.parametros.length){
                 const error = new Errror('Semantico',
@@ -65,7 +66,7 @@ class Llamada_funcion extends Nodo{
                
                 }
                 parametro.ejecutar(tabla,arbol);
-                tipo2 = parametro.get_tipo();
+                tipo2 = parametro.tipo;
                 if(this.funcion.parametros[i].tipo.type != tipo2.type){
                     si_llama = false;
                 }

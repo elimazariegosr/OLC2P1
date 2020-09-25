@@ -14,9 +14,6 @@ class Return extends Nodo {
         this.valor = null;
     }
 
-    get_tipo(){
-        return this.tipo;
-    }
     ejecutar(tabla: Tabla, arbol: Arbol){
         if(this.condicion != null){
             this.valor = this.condicion.ejecutar(tabla, arbol);

@@ -24,8 +24,6 @@ class Declaracion extends Nodo{
         
     }
 
-    get_tipo(){return this.tipo};
-    
     ejecutar(tabla: Tabla, arbol: Arbol){
         let resultado = null;
         if(this.valor != null){

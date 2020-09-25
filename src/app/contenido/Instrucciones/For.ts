@@ -33,9 +33,10 @@ class For extends Nodo{
         let res;
         let contador = 0;
         if(this.exp1 instanceof Declaracion || this.exp1 instanceof Asignacion){
-            this.exp1.ejecutar(tabla, arbol);
+            this.exp1.ejecutar(nueva_tabla, arbol);
         }
         do {
+            nueva_tabla = new Tabla(nueva_tabla);
             res = this.exp2.ejecutar(nueva_tabla, arbol);
             console.log(res);
             if (res instanceof Error) {
@@ -54,15 +55,17 @@ class For extends Nodo{
             if(res){
                 for (let i = 0; i < this.contenido.length; i++) {                  
                     const cont = this.contenido[i].ejecutar(nueva_tabla, arbol);
-                    if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                    if(cont instanceof Return){
                         return cont;
+                    }
+                    if(cont instanceof Continue || cont instanceof Break){
+                        return null;
                     }
                 }   
             }else{
                 return null;
             }
             contador++;
-            nueva_tabla = new Tabla(tabla);
             this.exp3.ejecutar(nueva_tabla,arbol);
             } while (res && contador < 99999999);
  

@@ -30,10 +30,6 @@ class Funcion extends Nodo{
         this.cont_parametros = [];
     }
 
-    get_tipo(){
-        return this.tipo;
-    }
-    
     guardar_funcion(tabla: Tabla, arbol:Arbol){
         let simbolo: Simbolo;
         simbolo = new Simbolo(this.tipo, this.id, this, this.linea, this.columna);

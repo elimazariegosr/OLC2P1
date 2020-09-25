@@ -28,7 +28,7 @@
     const {For_1} = require('./Instrucciones/For_1');
     
     let tipo_dec = "";
-   
+    let errores = [];
     function unir_listas(lista1, lista2){
         lista1.forEach(element => {
                 lista2.push(element);  
@@ -134,10 +134,10 @@ BSL               "\\".
 "+"                   return 'TK_MAS';
 "--"                  return 'TK_MENOS_MENOS';
 "-"                   return 'TK_MENOS';
+"**"                   return 'TK_ELEVADO';
 "*"                   return 'TK_MULTI';
 "/"                   return 'TK_DIV';
 "%"                   return 'TK_MOD';
-"**"                   return 'TK_ELEVADO';
 
 "."                   return 'TK_PUNTO';
 
@@ -148,8 +148,8 @@ BSL               "\\".
 {Ds}          				return 'TK_NUMERO';
 "\"\""                return 'TK_CADENA';
 "\""([^"]|{BSL})*"\"" return 'TK_CADENA';
-"\'\'"                return 'TK_CADENA';
-"\'"([^']|{BSL})*"\'" return 'TK_CADENA';
+'\'\''                return 'TK_CADENA';
+'\''([^']|{BSL})*'\'' return 'TK_CADENA';
 
 <<EOF>>               return 'EOF';
 .  {};           
@@ -163,12 +163,12 @@ BSL               "\\".
 %left TK_IGUAL_IGUAL, TK_DISTINTO
 %left TK_MAYOR_IGUAL, TK_MENOR_IGUAL, TK_MENOR, TK_MAYOR
 %left TK_MAS TK_MENOS TK_MAS_MAS TK_MENOS_MENOS
-%left TK_POR TK_DIV TK_MOD
-%left '**'
+%left TK_MULTI TK_DIV TK_MOD
+%left TK_ELEVADO
 
 
-%right TK_NOT
-%left UMENOS
+%left TK_NOT
+%left P_NEG
 
 %start INIT
 
@@ -434,13 +434,13 @@ INC_DEC    :    TK_ID TK_MAS_MAS {$$ = new Aritmetica(new Identificador($1,this.
  
 SENT_INC_DEC    :  INC_DEC {$$ = new Asignacion($1.nodo_izquierdo.id,$1,this._$.first_line,this._$.first_column);}
 ;
-EXPRESION   :   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}
-            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   EXPRESION TK_ELEVADO EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   EXPRESION TK_MOD EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, _$.first_column);}    
-            |   TK_MENOS EXPRESION {$$ = new Aritmetica($2,null,$1, this._$.first_line, _$.first_column);}
+EXPRESION   :   TK_MENOS EXPRESION  %prec P_NEG {$$ = new Aritmetica($2,null,$1, this._$.first_line, this._$.first_column);}
+            |   EXPRESION TK_MAS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}
+            |   EXPRESION TK_MENOS EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}    
+            |   EXPRESION TK_MULTI EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}    
+            |   EXPRESION TK_DIV EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}    
+            |   EXPRESION TK_ELEVADO EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}    
+            |   EXPRESION TK_MOD EXPRESION {$$ = new Aritmetica($1,$3,$2, this._$.first_line, this._$.first_column);}    
             |   EXPRESION TK_MAYOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}                
             |   EXPRESION TK_MENOR EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
             |   EXPRESION TK_MAYOR_IGUAL EXPRESION {$$ = new Relacional($1,$3,$2,this._$.first_line,this._$.first_column);}    
