@@ -2,9 +2,8 @@ function generateTree(treeData) {
     let size = getTreeLength(treeData[0]);
     // ************** Generate the tree diagram	 *****************
     var margin = { top: 20, right: 00, bottom: 20, left: 0 },
-        width = 80 * size - margin.right - margin.left,
+        width = 175 * size - margin.right - margin.left,
         height = 80 * size - margin.top - margin.bottom;
-
     var i = 0,
         duration = 750,
         root;
@@ -14,15 +13,16 @@ function generateTree(treeData) {
 
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.x, d.y]; });
-
-    var svg = d3.select("body").append("svg")
-        .attr("width", width + margin.right + margin.left)
-        .attr("height", height + margin.top + margin.bottom)
+        var svg = d3.select("body").select("svg")
+        .attr('width', width + margin.right + margin.left)
+        .attr('height', height + margin.top + margin.bottom)
+        .call(d3.behavior.zoom().on("zoom", function() {
+            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+        }))
         .attr("id", "grafo")
-        .append("g")
+        .select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    console.log(svg);    
     root = treeData[0];
     root.x0 = width;
     root.y0 = height;
