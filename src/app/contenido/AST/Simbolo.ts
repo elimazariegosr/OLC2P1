@@ -7,7 +7,7 @@ class Simbolo{
     columna: number;
     valor: Object;
     ambito: string;
-  
+    tipo_dec: string;
     constructor(tipo: Tipo, id: string, valor: Object, linea: number, columna: number) {
         this.tipo = tipo;
         this.id = id;

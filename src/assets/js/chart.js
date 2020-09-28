@@ -2,8 +2,8 @@ function generateTree(treeData) {
     let size = getTreeLength(treeData[0]);
     // ************** Generate the tree diagram	 *****************
     var margin = { top: 20, right: 00, bottom: 20, left: 0 },
-        width = 80 * size - margin.right - margin.left,
-        height = 30 * size - margin.top - margin.bottom;
+        width = 150 * size - margin.right - margin.left,
+        height = 60 * size - margin.top - margin.bottom;
     var i = 0,
         duration = 750,
         root;

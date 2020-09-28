@@ -47,6 +47,7 @@ class Declaracion extends Nodo{
         let simbolo: Simbolo;
         
         simbolo = new Simbolo(this.tipo, this.id, resultado, this.linea, this.columna);
+        simbolo.tipo_dec = this.tipo_declaracion;
         const resp = tabla.set_variable(simbolo);
         if(resp != null){
             const error = new Errror('Semantico',resp, this.linea, this.columna);

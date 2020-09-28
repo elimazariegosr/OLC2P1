@@ -42,8 +42,16 @@ class Asignacion extends Nodo{
         }else if(variable.tipo.type == tipos.ANY){
             variable.tipo = this.valor.tipo;
         }
-
-        variable.valor = res;
+        if(variable.tipo_dec != "const"){
+            variable.valor = res;
+        }else{
+            const error = new Errror('Semantico',
+            `No se le puede cambiar el valor a la constante` + this.id,
+            this.linea, this.columna);
+            arbol.errores.push(error);
+            arbol.consola.push(error.toString());
+            return error;
+        }
         return null;
     }
 }
