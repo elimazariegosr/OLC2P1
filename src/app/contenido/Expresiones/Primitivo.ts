@@ -1,5 +1,5 @@
 import {Nodo} from '../AST/Nodo';
-import {Tipo} from '../AST/Tipo';
+import {Tipo, tipos} from '../AST/Tipo';
 import {Tabla} from '../AST/Tabla';
 import {Arbol} from '../AST/Arbol';
 
@@ -13,6 +13,13 @@ class Primitivo extends Nodo{
     }
 
     ejecutar(tabla: Tabla, arbol: Arbol) {
+        if(this.tipo.type == tipos.BOOLEAN){
+            if(this.valor == "false"){
+                return false;
+            }else{
+                return true;
+            }
+        }
         return this.valor;
     }
 }

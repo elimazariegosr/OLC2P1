@@ -57,7 +57,7 @@ class While extends Nodo{
             }
             contador++;
             nueva_tabla = new Tabla(tabla);
-        } while (res && contador < 9999999);
+        } while (res && contador < 999999);
         return null;
     
     }

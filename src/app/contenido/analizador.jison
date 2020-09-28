@@ -1,9 +1,9 @@
 
 /* description: Parses end executes mathematical expressions. */
 %{
-    const {Imprimir} = require('./Instrucciones/Imprimir');
     const {Tipo, tipos} = require('./AST/Tipo'); 
-    const {Arbol} = require('./AST/Arbol'); 
+    const {Arbol} = require('./AST/Arbol');
+    const {Errror} = require('./AST/Errror'); 
     const {Primitivo} = require('./Expresiones/Primitivo');
     const {Aritmetica} = require('./Expresiones/Aritmetica');
     const {Relacional} = require('./Expresiones/Relacional');
@@ -13,6 +13,7 @@
     const {Break} = require('./Expresiones/Break');
 
     const {Identificador} = require('./Instrucciones/Identificador');
+    const {Imprimir} = require('./Instrucciones/Imprimir');
     const {Declaracion} = require('./Instrucciones/Declaracion');
     const {Asignacion} = require('./Instrucciones/Asignacion');
     const {If} = require('./Instrucciones/If');
@@ -26,9 +27,19 @@
     const {Default} = require('./Instrucciones/Default');
     const {Switch} = require('./Instrucciones/Switch');
     const {For_1} = require('./Instrucciones/For_1');
+    const {Typo} = require('./Instrucciones/Typo');
+    const {Type_object , Set_type} = require('./Instrucciones/Type_object');
+    const {Llamada_type} = require('./Instrucciones/Llamada_type');
+    const {Arreglo, Pop, Push, Length, SD_Arreglo, GD_Arreglo} = require('./Instrucciones/Arreglo');
     
     let tipo_dec = "";
     let errores = [];
+    let token_error = "";
+    let fila_error = 0;
+    let columna_error = 0;
+    function limpiar_lista(){
+            errores = [];
+    }
     function unir_listas(lista1, lista2){
         lista1.forEach(element => {
                 lista2.push(element);  
@@ -134,7 +145,7 @@ BSL               "\\".
 "+"                   return 'TK_MAS';
 "--"                  return 'TK_MENOS_MENOS';
 "-"                   return 'TK_MENOS';
-"**"                   return 'TK_ELEVADO';
+"**"                  return 'TK_ELEVADO';
 "*"                   return 'TK_MULTI';
 "/"                   return 'TK_DIV';
 "%"                   return 'TK_MOD';
@@ -152,7 +163,7 @@ BSL               "\\".
 '\''([^']|{BSL})*'\'' return 'TK_CADENA';
 
 <<EOF>>               return 'EOF';
-.  {};           
+.  {errores.push(new Errror("lexico", "No se reconoce el caracter: " + yytext, yylloc.first_line, yylloc.first_column))};           
 /lex
 /* operator associations and precedence */
 
@@ -175,15 +186,21 @@ BSL               "\\".
 %% /* language grammar */
 
 /*INICIO DE GRAMATICA*/
-INIT    :   SENTENCIAS EOF {$$ = new Arbol($1); console.log($1); return $$;}
+INIT    :   SENTENCIAS EOF {$$ = new Arbol($1, errores); return $$;}
+        |   EOF{$$ = new Arbol([],errores); return $$;}
 ;
 
-FUNCION   :   TK_FUNCTION TK_ID PARAMETROS  CONT_FUNCION {$$ = new Funcion($2,$3,$4,null,this._$.first_line,this._$.first_column);}
-          |   TK_FUNCTION TK_ID PARAMETROS TK_DOS_PUNTOS TIPO CONT_FUNCION {$$ = new Funcion($2,$3,$6,$5,this._$.first_line,this._$.first_column);}
+FUNCION   :   FUNCTION ID PARAMETROS  CONT_FUNCION {$$ = new Funcion($2,$3,$4,null,this._$.first_line,this._$.first_column);}
+          |   FUNCTION ID PARAMETROS DOS_PUNTOS TIPO CONT_FUNCION {$$ = new Funcion($2,$3,$6,$5,this._$.first_line,this._$.first_column);}
 ;
 
-CONT_FUNCION    :    TK_LL_ABRE LISTA_CONT_FUNCION TK_LL_CIERRA {$$ = $2;}
-                |    TK_LL_ABRE TK_LL_CIERRA {$$ = [];}
+ERROR_SINTACTIO    :    error TK_P_COMA {
+                        errores.push(new Errror("Sintactico", "Se encontro un error cerca del token: "
+                        + token_error ,f_error, c_error));} 
+;
+
+CONT_FUNCION    :    LL_ABRE LISTA_CONT_FUNCION LL_CIERRA {$$ = $2;}
+                |    LL_ABRE LL_CIERRA {$$ = [];}
 ;
 
 LISTA_CONT_FUNCION    :    LISTA_CONT_FUNCION  CONT_BLOQUE_FUNCION { $$ = $1; $$ = unir_listas($2, $$);}
@@ -194,16 +211,16 @@ CONT_BLOQUE_FUNCION     :     SENTENCIAS {$$ = $1;}
                         |     FUNCION  {$$ = [$1];}
 ;
 
-PARAMETROS   :   TK_P_ABRE LISTA_PARAMETROS TK_P_CIERRA {$$ = $2;}
-             |   TK_P_ABRE TK_P_CIERRA {$$ = [];}
+PARAMETROS   :   P_ABRE LISTA_PARAMETROS P_CIERRA {$$ = $2;}
+             |   P_ABRE P_CIERRA {$$ = [];}
 ;
 
-LISTA_PARAMETROS    :    LISTA_PARAMETROS TK_COMA PARAMETRO { $$ = $1; $$.push($3);}
+LISTA_PARAMETROS    :    LISTA_PARAMETROS COMA PARAMETRO { $$ = $1; $$.push($3);}
                     |    PARAMETRO  {$$ = [$1];} 
 ;
 
-PARAMETRO    :    TK_ID { $$ = new Declaracion("let",null, $1, null, this._$.first_line,this._$.first_column);}
-             |    TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion("let",$3, $1, null,this._$.first_line,this._$.first_column);}   
+PARAMETRO    :    ID { $$ = new Declaracion("let",null, $1, null, this._$.first_line,this._$.first_column);}
+             |    ID DOS_PUNTOS TIPO { $$ = new Declaracion("let",$3, $1, null,this._$.first_line,this._$.first_column);}   
 ;             
 
 /******************************************* RAIZ *********************************************************/
@@ -223,123 +240,149 @@ CONT_SENTENCIAS   :   IMPRIMIR {$$ = [$1];}
                   |   RETURN {  $$ = [$1];}
                   |   SENTENCIA_FOR{$$ = [$1];}  
                   |   SENTENCIA_FOR_1 {$$ = [$1];}  
-                  |   SENT_INC_DEC TK_P_COMA {$$ = [$1];}
+                  |   SENT_INC_DEC P_COMA {$$ = [$1];}
                   |   SENTENCIA_SWITCH {$$ = [$1];}
                   |   BREAK {$$ = [$1];}
                   |   CONTINUE {$$ = [$1];}
-                  |   DECLARACION_ARREGLO {$$ = [$1];}
+                  |   ARREGLO_PUSH {$$ = [$1];}
+                  |   ARREGLO_POP P_COMA {$$ = [$1];}  
+                  |   SD_ARREGLO {$$ = [$1];}
                   |   DECLARACION_TYPE {$$ = [$1];}
-                  |   ASIGNACION_TYPE {$$ = [$1];}
-;
+                  |   ERROR_SINTACTIO {$$  = [];}  
+ ;
 /******************************************* FIN RAIZ ****************************************************/
 
-RETURN    :    TK_RETURN TK_P_COMA {$$ = new Return(null, this._$.first_line,this._$.first_column);}
-          |    TK_RETURN EXPRESION TK_P_COMA{$$ = new Return($2, this._$.first_line,this._$.first_column);}
+RETURN    :    RETURN P_COMA {$$ = new Return(null, this._$.first_line,this._$.first_column);}
+          |    RETURN EXPRESION P_COMA{$$ = new Return($2, this._$.first_line,this._$.first_column);}
 ;
 
-BREAK   :   TK_BREAK TK_P_COMA{$$ = new Break(this._$.first_line,this._$.first_column);}
+BREAK   :   BREAK P_COMA{$$ = new Break(this._$.first_line,this._$.first_column);}
 ;
 
-CONTINUE   :   TK_CONTINUE TK_P_COMA {$$ = new Continue(this._$.first_line,this._$.first_column);}  
+CONTINUE   :   CONTINUE P_COMA {$$ = new Continue(this._$.first_line,this._$.first_column);}  
 ;
 
 /******************************************* DECLARACION VAR *********************************************/
-DECLARACION_VARIABLE    :     TIPO_DECLARACION LISTA_DECLARACION TK_P_COMA {$$ = $2;}
+DECLARACION_VARIABLE    :     TIPO_DECLARACION LISTA_DECLARACION P_COMA {$$ = $2;}
 ;
 
-LISTA_DECLARACION     :     LISTA_DECLARACION TK_COMA DECLARACION { $$ = $1; $$.push($3);}
+LISTA_DECLARACION     :     LISTA_DECLARACION COMA DECLARACION { $$ = $1; $$.push($3);}
                       |     DECLARACION {$$ = [$1];}
 ;
 
-DECLARACION     :     TK_ID {$$ = new Declaracion(tipo_dec,null, $1, null, this._$.first_line,this._$.first_column);}
-                |     TK_ID TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,null, $1, $3, this._$.first_line,this._$.first_column);}
-                |     TK_ID TK_DOS_PUNTOS TIPO { $$ = new Declaracion(tipo_dec,$3, $1, null,this._$.first_line,this._$.first_column);}
-                |     TK_ID TK_DOS_PUNTOS TIPO TK_IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,$3, $1, $5,this._$.first_line,this._$.first_column);}
+DECLARACION     :     ID {$$ = new Declaracion(tipo_dec,null, $1, null, this._$.first_line,this._$.first_column);}
+                |     ID IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,null, $1, $3, this._$.first_line,this._$.first_column);}
+                |     ID DOS_PUNTOS TIPO { $$ = new Declaracion(tipo_dec,$3, $1, null,this._$.first_line,this._$.first_column);}
+                |     ID DOS_PUNTOS TIPO IGUAL EXPRESION { $$ = new Declaracion(tipo_dec,$3, $1, $5,this._$.first_line,this._$.first_column);}
+                |     ID DOS_PUNTOS ID IGUAL LL_ABRE LISTA_ASIG_TYPE LL_CIERRA
+                            {$$ = new Type_object($1, $3, $6,0,0);}
+                |     ID IGUAL CONT_ARREGLO  {$$ = new Arreglo($1,null, $3, 0,0,0);}  
+                |     ID DOS_PUNTOS TIPO IGUAL CONT_ARREGLO  {$$ = new Arreglo($1,$3, $5, 0,0,0);}
+                |     ID DOS_PUNTOS TIPO TIPO_ARREGLO IGUAL CONT_ARREGLO  {$$ = new Arreglo($1,$3, $6, $4,0,0);}                   
+                |     ID DOS_PUNTOS TIPO TIPO_ARREGLO {$$ = new Arreglo($1,$3, [], $4,0,0);}
+                |                   
 ;          
 
-TIPO_DECLARACION    :   TK_LET  {$$ = $1; tipo_dec = $1;}
-                    |   TK_CONST {$$ = $1;tipo_dec = $1;}
+TIPO_DECLARACION    :   LET  {$$ = $1; tipo_dec = $1;}
+                    |   CONST {$$ = $1;tipo_dec = $1;}
 ;  
 /******************************************* FIN DECLARACION VAR *****************************************/
 
 /******************************************* ASGNACION VAR ***********************************************/
-ASiGNACION_VARIABLE     :    ASIGNACION TK_P_COMA  {$$ = $1;}
-                        |    ASIGNACION TK_P_COMA  {$$ =$1;}
+ASiGNACION_VARIABLE     :    ASIGNACION P_COMA  {$$ = $1;}
+                        |    ASIGNACION P_COMA  {$$ =$1;}
+
 ;
 
-ASIGNACION    :    TK_ID TK_IGUAL EXPRESION {$$ = new Asignacion($1,$3,this._$.first_line,this._$.first_column);}
+ASIGNACION    :    ID IGUAL EXPRESION {$$ = new Asignacion($1,$3,this._$.first_line,this._$.first_column);}
               |    SENT_INC_DEC {$$ = $1;}
+              |    LISTA_ID IGUAL EXPRESION {$$ = new Set_type($1, $3, 0, 0);}
 ;                   
 /******************************************* FIN ASIGNACION VAR ******************************************/
 
 /******************************************* DECLARACION ARREGLO *****************************************/
-DECLARACION_ARREGLO   :   TIPO_DECLARACION TK_ID TK_DOS_PUNTOS TIPO TIPO_ARREGLO TK_P_COMA
-                      |   TIPO_DECLARACION TK_ID TK_DOS_PUNTOS TIPO TIPO_ARREGLO TK_IGUAL 
-                          CONT_ARREGLO TK_P_COMA
-; 
 
-CONT_ARREGLO   :   TK_C_ABRE LISTA_CONT_ARREGLO TK_C_C  IERRA
-               |   CONT_TIPO_ARREGLO
+CONT_ARREGLO   :   C_ABRE LISTA_CONT_ARREGLO C_CIERRA {$$ = $2;}
+               |   C_ABRE C_CIERRA {$$ = [];}
+               |   EXPRESION {$$ = $1;}
+                     
 ;
 
-LISTA_CONT_ARREGLO   :   LISTA_CONT_ARREGLO TK_COMA EXPRESION
-                     |   EXPRESION
+LISTA_CONT_ARREGLO   :   LISTA_CONT_ARREGLO COMA CONT_ARREGLO {$$ = $1; $$.push($3);}
+                     |   CONT_ARREGLO{$$= [$1];}
 ;
 
-TIPO_ARREGLO   :   TIPO_ARREGLO CONT_TIPO_ARREGLO
-               |   CONT_TIPO_ARREGLO
+TIPO_ARREGLO   :   TIPO_ARREGLO CONT_TIPO_ARREGLO {$$ = $1; $$ += $2;}
+               |   CONT_TIPO_ARREGLO {$$ = $1;}
+;
+CONT_TIPO_ARREGLO   :   C_ABRE C_CIERRA {$$ = 1;}
 ;
 
-CONT_TIPO_ARREGLO   :   TK_C_ABRE TK_C_CIERRA 
+ARREGLO_PUSH   :   ID PUNTO PUSH P_ABRE EXPRESION P_CIERRA P_COMA {$$ = new Push($1, $5, 0,0);}
+               |   ID PUNTO PUSH P_ABRE CONT_ARREGLO P_CIERRA P_COMA {$$ = new Push($1, $5, 0,0);}
+;
+
+ARREGLO_POP    :   ID PUNTO POP P_ABRE P_CIERRA  {$$ = new Pop($1, 0,0);}
+;
+
+GD_ARREGLO    :   ID LIST_D_ARREGLO {$$ = new GD_Arreglo($1, $2,0,0);}
+;
+SD_ARREGLO    :   ID LIST_D_ARREGLO IGUAL EXPRESION P_COMA {$$ = new SD_Arreglo($1, $2, $4,0,0);}
+              |   ID LIST_D_ARREGLO IGUAL CONT_ARREGLO P_COMA {$$ = new SD_Arreglo($1, $2, $4,0,0);}
+;
+LIST_D_ARREGLO  :   LIST_D_ARREGLO C_ABRE EXPRESION C_CIERRA {$$ = $1; $$.push($3);} 
+                |   C_ABRE EXPRESION C_CIERRA{$$ = [$2];}
 ;
 /*************************************** FIN DECLARACION ARREGLO *****************************************/
 
 
 /******************************************* DECLARACION TYPE ********************************************/
-DECLARACION_TYPE    :    TK_TYPE TK_ID TK_IGUAL TK_LL_ABRE LISTA_CONT_TYPE TK_LL_CIERRA TK_P_COMA
+DECLARACION_TYPE    :    TYPE ID IGUAL LL_ABRE LISTA_CONT_TYPE LL_CIERRA P_COMA
+        {$$ = new Typo($2,$5,0,0);}
 ;
 
-LISTA_CONT_TYPE   :   LISTA_CONT_TYPE TK_COMA CONT_TYPE
-                  |   CONT_TYPE
+LISTA_CONT_TYPE   :   LISTA_CONT_TYPE COMA CONT_TYPE{$$ = $1; $$.push($3);}
+                  |   CONT_TYPE {$$ = [$1];}
 ;
 
-CONT_TYPE   :   TK_ID TK_DOS_PUNTOS TIPO
-            |   TK_ID TK_DOS_PUNTOS TK_ID
+
+CONT_TYPE   :   ID DOS_PUNTOS TIPO {$$ = [$1, $3];}
 ;
 
+
+LISTA_ID    :  LISTA_ID PUNTO ID{$$ = $1; $$.push($3);}        
+            |  ID PUNTO ID {$$ = [$1,$3];}
+;           
 /*************************************** FIN DECLARACION TYPE ********************************************/
-ASIGNACION_TYPE    :   TK_ID TK_IGUAL TK_LL_ABRE  LISTA_ASIG_TYPE TK_LL_CIERRA TK_P_COMA
-                   |   LISTA_ID_TYPE TK_IGUAL EXPRESION TK_P_COMA     
-;
 
-LISTA_ID_TYPE   :   LISTA_ID_TYPE TK_PUNTO TK_ID {$$ = $1; $$.push($3);}
-                |   TK_ID {$$ = [$1];}
+LISTA_ID_TYPE   :   LISTA_ID_TYPE PUNTO ID {$$ = $1; $$.push($3);}
+                |   ID {$$ = [$1];}
 ;               
 
-LISTA_ASIG_TYPE    :   LISTA_ASIG_TYPE TK_COMA CONT_ASIG_TIPE {$$ = $1; $$.push($2);}
+LISTA_ASIG_TYPE    :   LISTA_ASIG_TYPE COMA CONT_ASIG_TIPE {$$ = $1; $$.push($3);}
                    |   CONT_ASIG_TIPE {$$ = [$1];}
 ;
 
-CONT_ASIG_TIPE   :   TK_ID TK_DOS_PUNTOS EXPRESION {$$ = [$1, $3];}
+CONT_ASIG_TIPE   :   ID DOS_PUNTOS EXPRESION {$$ = [$1, $3];}
 ;
 
 
 /******************************************* SENTENCIA SWITCH  *******************************************/
-SENTENCIA_SWITCH   :   TK_SWITCH CONDICIONAL CONT_SWITCH {$$ = new Switch($2, $3,this._$.first_line,this._$.first_column);} 
+SENTENCIA_SWITCH   :   SWITCH CONDICIONAL CONT_SWITCH {$$ = new Switch($2, $3,this._$.first_line,this._$.first_column);} 
 ;
 
-CONT_SWITCH    :   TK_LL_ABRE LISTA_CASES TK_LL_CIERRA {$$ = $2;}
-               |   TK_LL_ABRE TK_LL_CIERRA {$$ = [];}
+CONT_SWITCH    :   LL_ABRE LISTA_CASES LL_CIERRA {$$ = $2;}
+               |   LL_ABRE LL_CIERRA {$$ = [];}
 ;               
 
 LISTA_CASES    :    LISTA_CASES CASES {$$ = $1; $$.push($2);}
               |    CASES {$$ = [$1];}
 ;
 
-CASES    :    TK_CASE EXPRESION TK_DOS_PUNTOS CONT_CASE {$$ = new Case($2, $4,this._$.first_line,this._$.first_column);}
-         |    TK_CASE EXPRESION TK_DOS_PUNTOS {$$ = new Case($2, [],this._$.first_line,this._$.first_column);}
-         |    TK_DEFAULT TK_DOS_PUNTOS CONT_CASE {$$ = new Default($3,this._$.first_line,this._$.first_column);}
-         |    TK_DEFAULT TK_DOS_PUNTOS {$$ = new Default([],this._$.first_line,this._$.first_column);}
+CASES    :    CASE EXPRESION DOS_PUNTOS CONT_CASE {$$ = new Case($2, $4,this._$.first_line,this._$.first_column);}
+         |    CASE EXPRESION DOS_PUNTOS {$$ = new Case($2, [],this._$.first_line,this._$.first_column);}
+         |    DEFAULT DOS_PUNTOS CONT_CASE {$$ = new Default($3,this._$.first_line,this._$.first_column);}
+         |    DEFAULT DOS_PUNTOS {$$ = new Default([],this._$.first_line,this._$.first_column);}
 ;
 
 CONT_CASE     :    CONT_CONTROL { $$ = $1;}
@@ -348,87 +391,87 @@ CONT_CASE     :    CONT_CONTROL { $$ = $1;}
 /******************************************* FIN SENTENCIA SWITCH  ****************************************/
 
 /******************************************* SENTENCIA IF   ***********************************************/
-SENTENCIA_IF    :    TK_IF CONDICIONAL CONT_CONTROL{ $$ = new If($2, $3, [],this._$.first_line,this._$.first_column);}
-                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE CONT_CONTROL {$$ = new If($2, $3, $5,this._$.first_line,this._$.first_column);}
-                |    TK_IF CONDICIONAL CONT_CONTROL TK_ELSE SENTENCIA_IF{ $$ = new If($2, $3, [$5],this._$.first_line,this._$.first_column);}
+SENTENCIA_IF    :    IF CONDICIONAL CONT_CONTROL{ $$ = new If($2, $3, [],this._$.first_line,this._$.first_column);}
+                |    IF CONDICIONAL CONT_CONTROL ELSE CONT_CONTROL {$$ = new If($2, $3, $5,this._$.first_line,this._$.first_column);}
+                |    IF CONDICIONAL CONT_CONTROL ELSE SENTENCIA_IF{ $$ = new If($2, $3, [$5],this._$.first_line,this._$.first_column);}
 ;
 /******************************************* FIN SENTENCIA IF  ********************************************/
 
 
 /******************************************* SENTENCIA WHILE  *********************************************/
-SENTENCIA_WHILE   :   TK_WHILE CONDICIONAL CONT_CONTROL {$$ = new While($2, $3,this._$.first_line,this._$.first_column);}
+SENTENCIA_WHILE   :   WHILE CONDICIONAL CONT_CONTROL {$$ = new While($2, $3,this._$.first_line,this._$.first_column);}
 ;
 /******************************************* FIN SENTENCIA WHILE  *****************************************/
 
-SENTENCIA_DO_WHILE  :  TK_DO CONT_CONTROL TK_WHILE CONDICIONAL TK_P_COMA{$$ = new Do_while($4, $2, this._$.first_line,this._$.first_column);}
+SENTENCIA_DO_WHILE  :  DO CONT_CONTROL WHILE CONDICIONAL P_COMA{$$ = new Do_while($4, $2, this._$.first_line,this._$.first_column);}
 ;
 
 /************************ CONDICIONAL PARA DIVERSAS SENTENCIAS  *******************************************/
-CONDICIONAL   :   TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}
+CONDICIONAL   :   P_ABRE EXPRESION P_CIERRA {$$ = $2;}
 ;
 
 
 /************************** CONTENIDO PARA DIVERSAS SENTENCIAS  *******************************************/
-CONT_CONTROL   :   TK_LL_ABRE SENTENCIAS TK_LL_CIERRA {$$ = $2;}
-               |   TK_LL_ABRE TK_LL_CIERRA {$$ = [];}
+CONT_CONTROL   :   LL_ABRE SENTENCIAS LL_CIERRA {$$ = $2;}
+               |   LL_ABRE LL_CIERRA {$$ = [];}
 ;
 
 /*******************************************  SENTENCIA FOR  **********************************************/
-SENTENCIA_FOR   :   TK_FOR TK_P_ABRE ASING_DEC_FOR
-                    TK_P_COMA EXPRESION TK_P_COMA 
-                    ASIGNACION TK_P_CIERRA CONT_FOR
+SENTENCIA_FOR   :   FOR P_ABRE ASING_DEC_FOR
+                    P_COMA EXPRESION P_COMA 
+                    ASIGNACION P_CIERRA CONT_FOR
                     {$$ = new For($3,$5,$7,$9, this._$.first_line,this._$.first_column);}
 ;
 
-CONT_FOR    :    TK_LL_ABRE TK_LL_CIERRA{$$ = [];}
-            |    TK_LL_ABRE SENTENCIAS TK_LL_CIERRA{$$ = $2;}
+CONT_FOR    :    LL_ABRE LL_CIERRA{$$ = [];}
+            |    LL_ABRE SENTENCIAS LL_CIERRA{$$ = $2;}
 ;               
 
-ASING_DEC_FOR   :    TK_LET DECLARACION {$2.tipo_declaracion = $1; $$ = $2;}
+ASING_DEC_FOR   :    LET DECLARACION {$2.tipo_declaracion = $1; $$ = $2;}
                 |    ASiGNACION_VARIABLE {$$ = $1;}
 ;
 /*******************************************  SENTENCIA FOR  **********************************************/
 
-SENTENCIA_FOR_1   :   TK_FOR TK_P_ABRE TK_LET TK_ID TIPO_FOR_1 TK_ID TK_P_CIERRA CONT_FOR
+SENTENCIA_FOR_1   :   FOR P_ABRE LET ID TIPO_FOR_1 ID P_CIERRA CONT_FOR
                    {$$ = new For_1($4, $5, $6, $8, this._$.first_line,this._$.first_column);}     
 ;
-TIPO_FOR_1   :   TK_IN {$$ = $1;}  
-             |   TK_OF {$$ = $1;}
+TIPO_FOR_1   :   IN {$$ = $1;}  
+             |   OF {$$ = $1;}
 ;
 
 /*******************************************  SENTENCIA IMPRIMIR  *****************************************/
-IMPRIMIR    :   TK_CONSOLE TK_PUNTO TK_LOG CONT_IMPRIMIR TK_P_COMA {$$ = new Imprimir($4, this._$.first_line, this._$.first_column);}
-;   
+IMPRIMIR    :   CONSOLE PUNTO LOG CONT_IMPRIMIR P_COMA {$$ = new Imprimir($4, this._$.first_line, this._$.first_column);}
+;
 
-CONT_IMPRIMIR   :    TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}
-                |    TK_P_ABRE TK_P_CIERRA{$$ = null;}
+CONT_IMPRIMIR   :    P_ABRE EXPRESION P_CIERRA {$$ = $2;}
+                |    P_ABRE P_CIERRA{$$ = null;}
 ;
 /*******************************************  FIN SENTENCIA IMPRIMIR  *************************************/
 
-TIPO    :   TK_NUMBER   { $$ = new Tipo(tipos.NUMBER);}
-        |   TK_STRING   { $$ = new Tipo(tipos.STRING);}
-        |   TK_VOID     { $$ = new Tipo(tipos.VOID);}
-        |   TK_BOOLEAN  { $$ = new Tipo(tipos.BOOLEAN);}
-        |   TK_ANY      { $$ = new Tipo(tipos.ANY);}
-        |   TK_ID       { $$ = $1;}
+TIPO    :   NUMBER   { $$ = new Tipo(tipos.NUMBER);}
+        |   STRING   { $$ = new Tipo(tipos.STRING);}
+        |   VOID     { $$ = new Tipo(tipos.VOID);}
+        |   BOOLEAN  { $$ = new Tipo(tipos.BOOLEAN);}
+        |   ANY      { $$ = new Tipo(tipos.ANY);}
+        |   ID       { $$ = $1;}
 ;
 
-LLAMADA_FUNCION    :   LLAMADA_FUNCION_EXP TK_P_COMA {$$ = $1;}
+LLAMADA_FUNCION    :   LLAMADA_FUNCION_EXP P_COMA {$$ = $1;}
 ;
 
-LLAMADA_FUNCION_EXP    :    TK_ID CONT_LLAMADA  {$$ = new Llamada_funcion($1,$2, this._$.first_line,this._$.first_column);}
+LLAMADA_FUNCION_EXP    :    ID CONT_LLAMADA  {$$ = new Llamada_funcion($1,$2, this._$.first_line,this._$.first_column);}
 ;      
 
-CONT_LLAMADA    :    TK_P_ABRE TK_P_CIERRA {$$ = [];}
-                |    TK_P_ABRE LISTA_CONT_LLAMADA TK_P_CIERRA {$$ = $2}
+CONT_LLAMADA    :    P_ABRE P_CIERRA {$$ = [];}
+                |    P_ABRE LISTA_CONT_LLAMADA P_CIERRA {$$ = $2}
 ;
-LISTA_CONT_LLAMADA   :   LISTA_CONT_LLAMADA TK_COMA EXPRESION {$$ = $1; $$.push($3);}
+LISTA_CONT_LLAMADA   :   LISTA_CONT_LLAMADA COMA EXPRESION {$$ = $1; $$.push($3);}
                      |   EXPRESION { $$ = [$1];}
 ;
 
-INC_DEC    :    TK_ID TK_MAS_MAS {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
+INC_DEC    :    ID MAS_MAS {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
                         new Primitivo(new Tipo(tipos.NUMBER), 1,this._$.first_line,this._$.first_column),"+",this._$.first_line,this._$.first_column);}
-                |    TK_ID TK_MENOS_MENOS  {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
+                |    ID MENOS_MENOS  {$$ = new Aritmetica(new Identificador($1,this._$.first_line, this._$.first_column),
                         new Primitivo(new Tipo(tipos.NUMBER), 1,this._$.first_line,this._$.first_column),"-",this._$.first_line,this._$.first_column);}
 ;                 
  
@@ -450,16 +493,85 @@ EXPRESION   :   TK_MENOS EXPRESION  %prec P_NEG {$$ = new Aritmetica($2,null,$1,
             |   EXPRESION TK_AND EXPRESION {$$ = new Logica($1,$3,$2,this._$.first_line,this._$.first_column);}
             |   EXPRESION TK_OR EXPRESION {$$ = new Logica($1,$3,$2,this._$.first_line,this._$.first_column);}
             |   TK_NOT EXPRESION {$$ = new Logica($2,null,$1,this._$.first_line,this._$.first_column);}
-            |   EXPRESION TK_INTERROGACION EXPRESION TK_DOS_PUNTOS EXPRESION
+            |   EXPRESION TK_INTERROGACION EXPRESION DOS_PUNTOS EXPRESION
                         { $$ = new Ternario(new Tipo(tipos.BOOLEAN),$1,$3,$5,this._$.first_line,this._$.first_column);}
-            |   TK_CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),this._$.first_line, this._$.first_column);}
-            |   TK_NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),this._$.first_line, this._$.first_column);}        
-            |   TK_TRUE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,this._$.first_line, this._$.first_column);}        
-            |   TK_FALSE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), $1,this._$.first_line, this._$.first_column);}        
-            |   TK_ID       { $$ = new Identificador($1, this._$.first_line, this._$.first_column); }
+            |   CADENA   {$$ = new Primitivo(new Tipo(tipos.STRING), $1.replace(/\"/g,"").replace(/\'/g,""),this._$.first_line, this._$.first_column);}
+            |   NUMERO   {$$ = new Primitivo(new Tipo(tipos.NUMBER), Number($1),this._$.first_line, this._$.first_column);}        
+            |   TRUE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), true,this._$.first_line, this._$.first_column);}        
+            |   FALSE   {$$ = new Primitivo(new Tipo(tipos.BOOLEAN), false,this._$.first_line, this._$.first_column);}        
+            |   ID       { $$ = new Identificador($1, this._$.first_line, this._$.first_column); }
             |   LLAMADA_FUNCION_EXP {$$  = $1;}
             |   INC_DEC {$$ = $1;}
-            |   TK_P_ABRE EXPRESION TK_P_CIERRA {$$ = $2;}         
+            |   LISTA_ID {$$ = new Llamada_type($1,0,0);}
+            |   ARREGLO_POP {$$ = $1;}
+            |   GD_ARREGLO {$$ = $1;}
+            |   ID PUNTO LENGTH {$$ = new Length($1,0,0);}    
+            |   P_ABRE EXPRESION P_CIERRA {$$ = $2;}         
 ;   
 
+/*SIMBOLS*/
+CONSOLE   : TK_CONSOLE  {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+PUNTO     : TK_PUNTO    {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+LOG       : TK_LOG      {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+P_ABRE    : TK_P_ABRE   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+P_CIERRA  : TK_P_CIERRA {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+STRING    : TK_STRING   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+NUMBER    : TK_NUMBER   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+BOOLEAN   : TK_BOOLEAN  {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+VOID      : TK_VOID     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+LET       : TK_LET      {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+CONST     : TK_CONST    {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+ANY       : TK_ANY      {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+TYPE      : TK_TYPE     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+ARRAY     : TK_ARRAY    {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+PUSH      : TK_PUSH     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+POP       : TK_POP      {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+LENGTH    : TK_LENGTH   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+IF        : TK_IF       {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+ELSE      : TK_ELSE     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+SWITCH    : TK_SWITCH   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+CASE      : TK_CASE     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+DEFAULT   : TK_DEFAULT  {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
 
+FOR       : TK_FOR	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+OF	  : TK_OF	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+IN        : TK_IN	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+WHILE	  : TK_WHILE	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+DO	  : TK_DO	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+BREAK     : TK_BREAK	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+CONTINUE  : TK_CONTINUE {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+RETURN    : TK_RETURN	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+FUNCTION  : TK_FUNCTION {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+TRUE      : TK_TRUE	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+FALSE     : TK_FALSE    {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};  
+
+LL_ABRE   : TK_LL_ABRE	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;}; 
+LL_CIERRA : TK_LL_CIERRA{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+C_ABRE    : TK_C_ABRE	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+C_CIERRA  : TK_C_CIERRA {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+COMA      : TK_COMA     {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MENOR     : TK_MENOR   	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+P_COMA    : TK_P_COMA	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MAYOR     : TK_MAYOR	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};	
+DISTINTO  : TK_DISTINTO	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+OR	  : TK_OR	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+AND	  : TK_AND      {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+NOT       : TK_NOT	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+IGUAL     : TK_IGUAL	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MENOS     : TK_MENOS	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+ELEVADO	  : TK_ELEVADO  {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MULTI	  : TK_MULTI	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+DIV	  : TK_DIV	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MOD       : TK_MOD	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MAS 	  : TK_MAS	{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+CADENA 	  : TK_CADENA   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+NUMERO 	  : TK_NUMERO   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+ID 	  : TK_ID       {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+INTERROGACION	: TK_INTERROGACION {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+DOS_PUNTOS      : TK_DOS_PUNTOS    {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MENOR_IGUAL	: TK_MENOR_IGUAL   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+IGUAL_IGUAL	: TK_IGUAL_IGUAL   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MAYOR_IGUAL     : TK_MAYOR_IGUAL   {$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MAS_MAS	        : TK_MAS_MAS{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MENOS_MENOS 	:TK_MENOS_MENOS{$$ = $1; token_error = $1;f_error = this._$.first_line; c_error = this._$.first_column;};
+MENOS_MENOS 	:TK_MENOS_MENOS{$$ = $1; token_error = $1; f_error = this._$.first_line; c_error = this._$.first_column;};

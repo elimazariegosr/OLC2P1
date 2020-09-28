@@ -6,6 +6,7 @@ import { Break } from '../Expresiones/Break';
 import { Continue } from '../Expresiones/Continue';
 import { Primitivo } from '../Expresiones/Primitivo';
 import { Return } from '../Expresiones/Return';
+import { Arreglo } from './Arreglo';
 import { Declaracion } from './Declaracion';
 
 class For_1 extends Nodo{
@@ -26,15 +27,21 @@ class For_1 extends Nodo{
     }
 
     ejecutar(tabla: Tabla, arbol: Arbol){
+        let arr = "ARRAY#_" + this.id;
         let res = tabla.get_var(this.id);
+        if(res == null){
+            res = tabla.get_var(arr);
+        }
         let fin;
         if(res.tipo.type == tipos.STRING){
             fin = res.valor.toString().length;
             if(this.tipo_for == "in"){
                 // error
             }
-        }else if(res.tipo.type != tipos.ARREGLO){
-            //error
+        }else if(res.valor instanceof Arreglo){
+            fin = res.valor.contenido.length;
+        }else{
+            return null;
         }
         
         let nueva_tabla = new Tabla(tabla);
@@ -44,7 +51,14 @@ class For_1 extends Nodo{
                 dec = new Declaracion("let", res.tipo, this.variable, null, this.linea, this.columna);
                 if(res.tipo.type == tipos.STRING){
                     dec.valor = new Primitivo(res.tipo, res.valor[i],this.linea, this.columna);
+                }else if(res.valor instanceof Arreglo){
+                    dec.valor = res.valor.contenido[i];
                 }    
+            }else if(this.tipo_for == "in"){
+                dec = new Declaracion("let", res.tipo, this.variable, null, this.linea, this.columna);
+                if(res.valor instanceof Arreglo){
+                    dec.valor = new Primitivo(res.tipo, i,this.linea, this.columna);
+                }        
             }
             dec.ejecutar(nueva_tabla, arbol);
             for (let j = 0; j < this.contenido.length; j++) {

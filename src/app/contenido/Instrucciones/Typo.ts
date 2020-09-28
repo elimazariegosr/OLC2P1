@@ -1,3 +1,4 @@
+import { isString } from 'util';
 import { Arbol } from '../AST/Arbol';
 import { Errror } from '../AST/Errror';
 import { Nodo } from "../AST/Nodo";
@@ -9,15 +10,41 @@ class Typo extends Nodo{
 
     nombre: String;
     id: string;    
-    attributos: Map<string, Tipo>;
+    attributos = new Map<string, Tipo>();
+    valores: Array<Array<Object>>;
     
-    constructor(nombre: String, atributos: Map<string, Tipo>, linea: number, columna: number){
+    constructor(nombre: String, atributos: Array<Array<Object>>, linea: number, columna: number){
         super(new Tipo(tipos.TYPE), linea, columna);
         this.nombre = nombre;
         this.id = "TYPEREF#_" + nombre;
-        this.attributos = atributos;   
+        this.valores = atributos; 
+        this.agregar_atributos();  
     }
 
+    buscar_atributo(id){
+        for(let key of Array.from(this.attributos.keys()) ) {
+            if(key === id){
+                return this.attributos.get(key);
+            }
+        }
+        return null;
+    }
+    
+    agregar_atributos(){
+        this.valores.forEach(element => {
+            let att;
+            if(isString(element[0])){
+                att = element[0];
+            }
+            if(this.buscar_atributo(att) == null){
+                if(element[1] instanceof Tipo){
+                    this.attributos.set(att, element[1]);   
+                }
+            }else{
+                this.attributos[att] = element[1];
+            }
+        });
+    }
 
     ejecutar(tabla: Tabla, arbol: Arbol){
         let simbolo: Simbolo;    

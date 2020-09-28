@@ -11,8 +11,9 @@
                 </tr>
                 <tr>
                     <td>
-                        <textarea class="form-control" #entrada rows="8" style="margin-top: 0px; max-width: 550px; margin-bottom: 0px;"></textarea>
+                        <textarea class="form-control" #entrada  rows="8" style="margin-top: 0px; max-width: 550px; margin-bottom: 0px;"></textarea>
                     </td>
+
                     <td>
                         <textarea class="form-control" id="txt_traduccion"  name="txt_traduccion" rows="8"  style="max-width: 550px;"></textarea>
                     </td>
@@ -21,7 +22,7 @@
             <div>
                 <tr>
                     <td>
-                        <table>
+                        <table class= "table">
                             <tr>
                                 <td>
                                     <button type="button"  (click) = "traducir(entrada.value)" class="btn btn-info">Traducir</button>
@@ -35,6 +36,9 @@
                                 <td>
                                     <button type="button"  (click) = "mostrar_errores()" class="btn btn-info">Mostrar errores</button>
                                 </td>
+                                <td>
+                                    <button type="button"  (click) = "generar_AST()" class="btn btn-info">Mostrar arbol AST</button>
+                                </td>
                             </tr>
                         </table>
                     </td>
@@ -46,6 +50,8 @@
                 <textarea class="form-control" id="txt_consola" readonly name="txt_consola" rows="5" style="margin-top: 0px; max-width: 1140px; margin-bottom: 0px;"></textarea> 
                
             </div>
+            <br>
+            
         </div>
                
     <div #rep_p class="modal fade show" tabindex="-1" style="display: none; " >
@@ -61,4 +67,21 @@
           </div>
         </div>
       </div>
+      
+      <div #rep_ast class="modal fade show" tabindex="-1" style="display: none; " >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Reportes</h3>
+              <button type="button" class="close"  (click) = "ocultar_ast()"  data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body" >
+                <div id="tree_content" class="overflow-auto p-3 mb-3 mb-md-0 mr-md-3 bg-light" style="max-height: 450px; max-width: 700;">
+                    <svg></svg>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
       

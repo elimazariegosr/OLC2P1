@@ -19,6 +19,10 @@ import {For_1} from './Instrucciones/For_1';
 import {Switch} from './Instrucciones/Switch';
 import {Case} from './Instrucciones/Case';
 import {Default} from './Instrucciones/Default';
+import {Typo} from './Instrucciones/Typo';
+import {Set_type, Type_object} from './Instrucciones/Type_object';
+import {Llamada_type} from './Instrucciones/Llamada_type';
+import {Arreglo, Push, Pop, Length, SD_Arreglo, GD_Arreglo} from './Instrucciones/Arreglo';
 
 
 
@@ -33,8 +37,8 @@ import {Return} from './Expresiones/Return';
 import { Errror } from './AST/Errror';
 import { Nodo_AST } from './AST/Nodo_AST';
 import { Nodo } from './AST/Nodo';
+import { Reporte_AST } from './Complemento/Reporte_AST';
 const parser  = require('./analizador.js');
-
   declare var generateTree;
   
 @Component({
@@ -50,322 +54,125 @@ export class ContenidoComponent implements OnInit {
   }
 
   
-  arbol:Arbol;
-  tabla:Tabla;
-  desanidacion = new Desanidar();
-  abierto = true;
-  @ViewChild('rep_p') id:ElementRef; 
+  arbol:Arbol;// "Arbol" de analisis sintactico y semantico
+  tabla:Tabla;// tabla de simbolos
+  desanidacion = new Desanidar();// instancia a la clase desanidacion 
+  reporte_ast = new Reporte_AST();// instancia a la clase reporte ast
   
-  mostrar_tabla(val, id){
-   this.id.nativeElement.style.display = 'block';
+  @ViewChild('rep_p') id:ElementRef; // obtener el div flotante
+  @ViewChild('rep_ast') rep_ast:ElementRef; // obtener el div flotante
+  
+  //Metodo que muestra un div flotante con un valor y un titulo...
+  mostrar_tabla(val, titulo){
+   this.id.nativeElement.style.display = 'block';// poner visible el display
    let div = "<div style=\"display: block;\">";
-    div += "<h4>Tabla #" + id + " de simbolos generada</h4>";
+    div += "<h4>" + titulo + "</h4>"; // agregar el titulo al div
     div += val;
     div += "</div><br>"; 
-    document.getElementById("tablas").innerHTML += div ;
-    console.log("agregando tb");
+    document.getElementById("tablas").innerHTML += div ;// agregar el valor al div
    }
+
+  /**Metodo que oculta el div generico */ 
   ocultar_mod(){
      this.id.nativeElement.style.display = 'none';
   }
-  mostrar_errores(){}
+  /**Metodo que oculta el div generico */ 
+  ocultar_ast(){
+    this.rep_ast.nativeElement.style.display = 'none';
+ }
+  /** Metodo que muestra las tablas de simbolos generadas durante la ejecucion */
   mostrar_ts(){
     let i = 1;
-    this.arbol.reportes.forEach(element => {
-      this.mostrar_tabla(element, i);
+    this.arbol.reportes.forEach(element => {// Recorrer las tablas generadas
+      this.mostrar_tabla(element, "Tabla #" + i + " de simbolos generada");
       i++;
     });
   }
+  
+  mostrar_errores(){
+      let t_errores = "<table class=\"table table-striped table-hover\">";
+      t_errores += "<tr><td>TIPO</td><td>DESCRIPCION</td><td>LINEA</td><td>COLUMNA</td></tr>";
+      this.arbol.errores.forEach(e => {
+        t_errores += "<tr><td>" + e.tipo + "</td><td>" + e.desc + "</td><td>" + e.linea +"</td><td>" + e.columna + "</td></tr>";
+      });
+      t_errores += "</table>";
+      this.mostrar_tabla(t_errores, "ERORES");
+  }
+
+  /*Metodo que ejecuta las sentencias obtenidas del analisis sintactico*/
   ejecutar(entrada:string):void{
-    
-    document.getElementById("tablas").innerHTML ="";
-           this.arbol = parser.parse(entrada);
-      if(!this.desanidacion.hay_anidada(this.arbol)){
+    try{
+      document.getElementById("tablas").innerHTML ="";// limpiando el div que contiene tablas de erores y ts
+ 
+      this.arbol = parser.parse(entrada);// obtener el rbol del analisis sintactico
+      if(!this.desanidacion.hay_anidada(this.arbol)){// preguntar si existe alguna funcion anidada...
         //EJECUCION
-        this.tabla = new Tabla(null);
-        this.arbol = parser.parse(entrada);
-       
-        this.arbol.instrucciones.forEach(element => {
+        this.tabla = new Tabla(null); // Inicializar la tabla de simbolos
+        this.arbol.instrucciones.forEach(element => {//primeraa pasada para guardar las funciones declaradas
           if(element instanceof Funcion){
               element.guardar_funcion(this.tabla, this.arbol);
           }
         });
-
-        this.arbol.instrucciones.forEach(element => {
-          if(element instanceof Declaracion){
+        this.arbol.instrucciones.forEach(element => { // tercera pasada para guardar los tyipos
+          if(element instanceof Typo){
             element.ejecutar(this.tabla, this.arbol);
           }
         });
-
-        this.arbol.instrucciones.forEach(element => {
-          if(!(element instanceof  Declaracion) && !(element instanceof Funcion)){
+        
+        this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
+          if(element instanceof Type_object){
+            element.ejecutar(this.tabla, this.arbol);
+          }
+        });
+        this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
+          if(element instanceof Declaracion || element instanceof Set_type || element instanceof Asignacion){
+            element.ejecutar(this.tabla, this.arbol);
+          }
+        });
+        
+        this.arbol.instrucciones.forEach(element => {// Ultima pasada para ejecutar algo distinto a lo anterior
+          if(!(element instanceof  Declaracion) && !(element instanceof Funcion)
+          && !(element instanceof Typo) && !(element instanceof Type_object)){
               element.ejecutar(this.tabla, this.arbol);
           }
         });
-
-        console.log(this.tabla);
         let salida = "";
-        this.arbol.consola.forEach(element => {
-          if(element instanceof Errror){
-            salida += element.desc + "\n";
-    
-          }else{
+        this.arbol.consola.forEach(element => {// obtener los resultados de consola
             salida += element + "\n";
-          }
         });
         console.log(this.arbol);
-        document.getElementById('txt_consola').innerHTML = salida;
-        this.reporte_ast();
+        document.getElementById('txt_consola').innerHTML = salida;// mostrarlos en la secicon de consola
       }else{
           alert("No puede ejecutar si hay funciones anidadas");
       }
-  }
-
-  traducir(entrada:string):void{
-    
-      this.arbol = parser.parse(entrada);     
-      let resultado = this.desanidacion.desanidar(this.arbol);
-      document.getElementById('txt_traduccion').innerHTML = resultado;
-      this.reporte_ast();
-   
-  }
-
-  sentencias_ast(sent):any{
-    if(sent instanceof If){
-      return this.if_ast(sent);
-    }else if(sent instanceof Declaracion){
-      return this.declaracion_ast(sent);
-    }else if(sent instanceof Asignacion){
-      return this.asignacion_ast(sent);
-    }else if(sent instanceof Break){
-      return new Nodo_AST("Break",null,[]);
-    }else if(sent instanceof Continue){
-      return new Nodo_AST("Continue",null,[]);
-    }else if(sent instanceof Return){
-      return this.return_ast(sent);
-    }else if(sent instanceof While){
-      return this.while_ast(sent);
-    }else if(sent instanceof Do_while){
-      return this.do_while_ast(sent);
-    }else if(sent instanceof Switch){
-      return this.switch_ast(sent);
-    }else if(sent instanceof For){
-      return this.for_ast(sent);
-    }/*else if(sent instanceof For_1){
-    }*/else if(sent instanceof Imprimir){
-      return this.imprimir_ast(sent);
-    }else if(sent instanceof Llamada_funcion){
-      return this.llamada_funcion_ast(sent);
-    }else if(sent instanceof Funcion){
-      return this.funcion_ast(sent);
-    } 
-  }
-  if_ast(sent:If):any{
-    let padre = new Nodo_AST("If", null,[]); 
-    let condicion = new Nodo_AST("Condicion", padre,[]);
-    let cont_if = new Nodo_AST("Contenido If", padre,[]);
-    let cont_else = new Nodo_AST("Contenido Else", padre,[]);
-    condicion.children.push(this.ast(sent.condicion));
-    sent.lista_if.forEach(element => {
-      cont_if.children.push(this.sentencias_ast(element));
-    });
-    sent.lista_else.forEach(element => {
-      cont_else.children.push(this.sentencias_ast(element));
-    });       
-    padre.children = [condicion, cont_if, cont_else];
-    return padre;
-  }
-  while_ast(sent: While){
-    let padre = new Nodo_AST("While", null,[]); 
-    let condicion = new Nodo_AST("Condicion", padre,[]);
-    let contenido = new Nodo_AST("Contenido", padre,[]);
-    condicion.children.push(this.ast(sent.condicion));
-    sent.contenido.forEach(element => {
-      contenido.children.push(this.sentencias_ast(element));
-    });
-    padre.children = [condicion, contenido];
-    return padre;
-  }
-
-  declaracion_ast(sent: Declaracion){
-    let padre = new Nodo_AST("Declaracion", null,[]);
-    padre.children.push(this.tipo_ast("Tipo declaracion", sent.tipo_declaracion));
-    padre.children.push(this.tipo_ast("Identificador", sent.id));
-    padre.children.push(this.tipo_ast("Tipo de dato", sent.tipo));
-    if(sent.valor != null){
-      let valor =  new Nodo_AST("Valor", padre, [this.ast(sent.valor)]);
-      padre.children.push(valor);
-    }
-    return padre;
-  }
-
-  asignacion_ast(sent: Asignacion){
-    let padre = new Nodo_AST("Asignacion ", null,[]); 
-    padre.children.push(this.tipo_ast("Identificador", sent.id));
-    let valor =  new Nodo_AST("Valor", padre, [this.ast(sent.valor)]);
-    padre.children.push(valor);
-    return padre; 
-  }
-
-  imprimir_ast(sent: Imprimir){
-    let padre = new Nodo_AST("Imprimir ", null,[]); 
-    padre.children.push(this.ast(sent.expresion)); 
-    return padre;
-  }
-  return_ast(sent: Return){
-    let padre = new Nodo_AST("Return ", null,[]); 
-    padre.children.push(this.ast(sent.condicion)); 
-    return padre;
-  }
-  
-  llamada_funcion_ast(sent: Llamada_funcion){
-      let padre =  new Nodo_AST("LLamada Funcion " + sent.nombre, null, []);
-      sent.parametros.forEach(element => {
-        padre.children.push(this.ast(element));
-      });
-      return padre;
-  }
-  funcion_ast(sent: Funcion){
-    let padre =  new Nodo_AST("Funcion ", null, []);
-    padre.children.push(this.tipo_ast("Identificador", sent.nombre));
-    
-    if(sent.parametros.length > 0){
-      let parametros = new Nodo_AST("Parametros ", padre, []);
-      sent.parametros.forEach(element => {
-        parametros.children.push(this.sentencias_ast(element));
-      });
-      padre.children.push(parametros);  
-    }
-    padre.children.push(this.tipo_ast("Tipo", sent.tipo));
-    
-    if(sent.contenido.length > 0){
-      let contenido = new Nodo_AST("Contenido", padre,[]);
-      sent.contenido.forEach(element => {
-        contenido.children.push(this.sentencias_ast(element));
-      });
-      padre.children.push(contenido);  
-    }
-    
-    return padre;
-  }
-
-  switch_ast(sent: Switch){
-    let padre =  new Nodo_AST("Switch" , null, []);
-    let exp1 = new Nodo_AST("Expresion", padre,[]);
-    exp1.children.push(this.ast(sent.expresion));
-
-    sent.contenido.forEach(element => {
-      if(element instanceof Case){
-          padre.children.push(this.case_ast(element));
-      }else if(element instanceof Default){
-        padre.children.push(this.default_ast(element));
-      }
-    });
-    return padre;
-  }
-  case_ast(sent: Case){
-    let padre =  new Nodo_AST("Case" , null, []);
-    let exp1 = new Nodo_AST("Expresion", padre,[]);
-    exp1.children.push(this.ast(sent.expresion));
-    let contenido = new Nodo_AST("Contenido", padre,[]);
-    sent.contenido.forEach(element => {
-      contenido.children.push(this.sentencias_ast(element));
-    });
-    padre.children = [exp1, contenido];
-    return padre;
-  }
-  default_ast(sent: Default){
-    let padre =  new Nodo_AST("Default" , null, []);
-    let contenido = new Nodo_AST("Contenido", padre,[]);
-    sent.contenido.forEach(element => {
-      contenido.children.push(this.sentencias_ast(element));
-    });
-    padre.children = [contenido];
-    return padre;
-  }
-
-  for_ast(sent: For){
-    let padre =  new Nodo_AST("For" , null, []);
-    let exp1 = new Nodo_AST("Expresion 1", padre,[]);
-    let exp2 = new Nodo_AST("Expresion 2", padre,[]);
-    let exp3 = new Nodo_AST("Expresion 3", padre,[]);
-    let contenido = new Nodo_AST("Contenido", padre,[]);
-   
-    exp1.children.push(this.sentencias_ast(sent.exp1));
-    exp2.children.push(this.ast(sent.exp2));
-    exp3.children.push(this.sentencias_ast(sent.exp3));
-
-    sent.contenido.forEach(element => {
-      contenido.children.push(this.sentencias_ast(element));
-    });
-    padre.children = [exp1, exp2, exp3, contenido];
-    return padre;
-  }
-
-  for_1_ast(sent: For_1){
-    
-  }
-
-  do_while_ast(sent: Do_while){
-    let padre = new Nodo_AST("Do While", null,[]); 
-    let condicion = new Nodo_AST("Condicion", padre,[]);
-    let contenido = new Nodo_AST("Contenido", padre,[]);
-    condicion.children.push(this.ast(sent.condicion));
-    sent.contenido.forEach(element => {
-      contenido.children.push(this.sentencias_ast(element));
-    });
-    padre.children = [condicion, contenido];
-    return padre; 
-  }
-
-  ast(element):any{
-    let exp = new Nodo_AST("E",null,[]);
-    if(element instanceof Aritmetica || element instanceof Logica || element instanceof Relacional){     
+    }catch(e){
+       alert("Error no encontrado :(");
       
-      if(element.nodo_derecho != null){
-          let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
-          izq.parent = exp;
-          exp.children.push(izq);
-          exp.children.push(new Nodo_AST(element.operador,exp,[]));
-          let der: Nodo_AST= this.ast(element.nodo_derecho);
-          der.parent = exp;
-          exp.children.push(der);
-      }else{
-        exp.children.push(new Nodo_AST(element.operador,exp,[]));
-        let izq: Nodo_AST= this.ast(element.nodo_izquierdo);
-        exp.children.push(izq);          
-      } 
-    }else if(element instanceof Primitivo){
-      let hijo = new Nodo_AST(element.valor.toString(), null, []);
-      let e = new Nodo_AST("E",null,[hijo]);   
-      return e;
-
-    }else if(element instanceof Identificador){
-      let hijo = new Nodo_AST(element.id.toString(), null, []);
-      let e = new Nodo_AST("E",null,[hijo]); 
-      return e; 
-    }else if(element instanceof Llamada_funcion){
-      let hijo = this.llamada_funcion_ast(element);
-      let e = new Nodo_AST("E",null,[hijo]); 
-      return e;
     }
-    return exp;
+    
   }
 
-  tipo_ast(tipo, valor){
-    return new Nodo_AST(tipo, null,[new Nodo_AST(valor, null, [])]);
+ /*Metodo para traducir la entrada inicial*/ 
+  traducir(entrada:string):void{
+    document.getElementById("tablas").innerHTML ="";// limpiando el div que contiene tablas de erores y ts
+ 
+    this.arbol = parser.parse(entrada);// obtener el analisis lexico y sintactico desde el parser     
+    let resultado = this.desanidacion.desanidar(this.arbol);// obtener la desanidacion y traduccion
+    document.getElementById('txt_traduccion').innerHTML = resultado;  // mostrar la traduccion en el text area
+    console.log(this.arbol);
   }
 
-  reporte_ast(){
-    if (document.getElementById("grafo")) {
-      document.getElementById("grafo").remove();
+/* Metodo para generar el arbol ast*/
+  generar_AST(){
+    this.rep_ast.nativeElement.style.display = 'block';// poner visible el display
+  
+    if (document.getElementById("grafo")) {// Remover el grafo anterior del html
+      document.getElementById("grafo").innerHTML = "";
     }
-   
-    let raiz = new Nodo_AST("Raiz",null,[]);  
-    this.arbol.instrucciones.forEach(element => {
-      raiz.children.push(this.sentencias_ast(element));      
-    });
-    generateTree([raiz]); 
+    let raiz = this.reporte_ast.get_Report(this.arbol);//obtener el arbol normalizado: name, parent, childrem
+    if(raiz != null){
+      generateTree([raiz]); //generar el grafo desde el script charts.js
+    }
   }
   ngOnInit(): void {
     

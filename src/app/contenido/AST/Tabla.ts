@@ -22,11 +22,11 @@ class Tabla{
     get_var(identifier: String): Simbolo{
         let t_actual: Tabla;
         for(t_actual = this; t_actual != null; t_actual = t_actual.t_anterior){
-            for(let key of Array.from( t_actual.variables.keys()) ) {
-                if(key === identifier){
-                    return t_actual.variables.get(key);
+                for(let key of Array.from( t_actual.variables.keys()) ) {
+                    if(key === identifier){
+                        return t_actual.variables.get(key);
+                    }
                 }
-            }
         }
         return null;
     }

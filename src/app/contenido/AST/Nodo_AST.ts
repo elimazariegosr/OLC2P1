@@ -1,5 +1,4 @@
-import { Nodo } from "./Nodo";
-
+/**Clase Nodo AST que sirve para graficar el arbol ast */
 class Nodo_AST{
     name:string;
     parent:Nodo_AST;

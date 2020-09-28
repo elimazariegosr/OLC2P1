@@ -15,9 +15,6 @@ class Case extends Nodo{
         this.contenido = contenido;
     }
 
-    get_tipo(){
-
-    }
     ejecutar(tabla: Tabla, arbol:Arbol){
         const nueva_tabla = new Tabla(tabla);
         for(let i = 0; i <  this.contenido.length; i++){
