@@ -53,7 +53,7 @@ export class ContenidoComponent implements OnInit {
     
   }
 
-  
+  traducido:boolean = false;
   arbol:Arbol;// "Arbol" de analisis sintactico y semantico
   tabla:Tabla;// tabla de simbolos
   desanidacion = new Desanidar();// instancia a la clase desanidacion 
@@ -99,68 +99,85 @@ export class ContenidoComponent implements OnInit {
       this.mostrar_tabla(t_errores, "ERORES");
   }
 
+  ejecutar_(entrada){
+      try{
+        document.getElementById("tablas").innerHTML ="";// limpiando el div que contiene tablas de erores y ts
+   
+        this.arbol = parser.parse(entrada);// obtener el rbol del analisis sintactico
+        this.pasadas();
+      }catch(e){
+         alert("Error no encontrado :(");
+        
+      }
+  }
+
+  pasadas(){
+   try{
+    if(!this.desanidacion.hay_anidada(this.arbol)){// preguntar si existe alguna funcion anidada...
+      //EJECUCION
+      this.tabla = new Tabla(null); // Inicializar la tabla de simbolos
+      this.arbol.instrucciones.forEach(element => {//primeraa pasada para guardar las funciones declaradas
+        if(element instanceof Funcion){
+            element.guardar_funcion(this.tabla, this.arbol);
+        }
+      });
+      this.arbol.instrucciones.forEach(element => { // tercera pasada para guardar los tyipos
+        if(element instanceof Typo){
+          element.ejecutar(this.tabla, this.arbol);
+        }
+      });
+      
+      this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
+        if(element instanceof Type_object){
+          element.ejecutar(this.tabla, this.arbol);
+        }
+      });
+      this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
+        if(element instanceof Declaracion || element instanceof Set_type || element instanceof Asignacion){
+          element.ejecutar(this.tabla, this.arbol);
+        }
+      });
+      
+      this.arbol.instrucciones.forEach(element => {// Ultima pasada para ejecutar algo distinto a lo anterior
+        if(!(element instanceof  Declaracion) && !(element instanceof Funcion)
+        && !(element instanceof Typo) && !(element instanceof Type_object)){
+            element.ejecutar(this.tabla, this.arbol);
+        }
+      });
+      let salida = "";
+      this.arbol.consola.forEach(element => {// obtener los resultados de consola
+          salida += element + "\n";
+      });
+      console.log(this.arbol);
+      document.getElementById('txt_consola').innerHTML = salida;// mostrarlos en la secicon de consola
+    }else{
+        alert("No puede ejecutar si hay funciones anidadas");
+    }
+   }catch(e){
+      alert("Error no encontrado");
+   }
+   
+  }
   /*Metodo que ejecuta las sentencias obtenidas del analisis sintactico*/
   ejecutar(entrada:string):void{
-    try{
-      document.getElementById("tablas").innerHTML ="";// limpiando el div que contiene tablas de erores y ts
- 
-      this.arbol = parser.parse(entrada);// obtener el rbol del analisis sintactico
-      if(!this.desanidacion.hay_anidada(this.arbol)){// preguntar si existe alguna funcion anidada...
-        //EJECUCION
-        this.tabla = new Tabla(null); // Inicializar la tabla de simbolos
-        this.arbol.instrucciones.forEach(element => {//primeraa pasada para guardar las funciones declaradas
-          if(element instanceof Funcion){
-              element.guardar_funcion(this.tabla, this.arbol);
-          }
-        });
-        this.arbol.instrucciones.forEach(element => { // tercera pasada para guardar los tyipos
-          if(element instanceof Typo){
-            element.ejecutar(this.tabla, this.arbol);
-          }
-        });
-        
-        this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
-          if(element instanceof Type_object){
-            element.ejecutar(this.tabla, this.arbol);
-          }
-        });
-        this.arbol.instrucciones.forEach(element => {//segunda pasada para guardar las variables
-          if(element instanceof Declaracion || element instanceof Set_type || element instanceof Asignacion){
-            element.ejecutar(this.tabla, this.arbol);
-          }
-        });
-        
-        this.arbol.instrucciones.forEach(element => {// Ultima pasada para ejecutar algo distinto a lo anterior
-          if(!(element instanceof  Declaracion) && !(element instanceof Funcion)
-          && !(element instanceof Typo) && !(element instanceof Type_object)){
-              element.ejecutar(this.tabla, this.arbol);
-          }
-        });
-        let salida = "";
-        this.arbol.consola.forEach(element => {// obtener los resultados de consola
-            salida += element + "\n";
-        });
-        console.log(this.arbol);
-        document.getElementById('txt_consola').innerHTML = salida;// mostrarlos en la secicon de consola
-      }else{
-          alert("No puede ejecutar si hay funciones anidadas");
-      }
-    }catch(e){
-       alert("Error no encontrado :(");
-      
+    if(this.traducido){
+      this.pasadas();
+      this.traducido = false;
+    }else{
+      this.ejecutar_(entrada);
     }
-    
+
   }
 
  /*Metodo para traducir la entrada inicial*/ 
   traducir(entrada:string):void{
+    this.traducido = true;
     document.getElementById("tablas").innerHTML ="";// limpiando el div que contiene tablas de erores y ts
  
     this.arbol = parser.parse(entrada);// obtener el analisis lexico y sintactico desde el parser     
     let resultado = this.desanidacion.desanidar(this.arbol);// obtener la desanidacion y traduccion
     document.getElementById('txt_traduccion').innerHTML = resultado;  // mostrar la traduccion en el text area
-    console.log(this.arbol);
-  }
+   }
 
 /* Metodo para generar el arbol ast*/
   generar_AST(){

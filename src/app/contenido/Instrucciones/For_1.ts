@@ -63,8 +63,11 @@ class For_1 extends Nodo{
             dec.ejecutar(nueva_tabla, arbol);
             for (let j = 0; j < this.contenido.length; j++) {
                 const cont = this.contenido[j].ejecutar(nueva_tabla, arbol);
-                if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                if(cont instanceof Return){
                     return cont;
+                }
+                if(cont instanceof Continue || cont instanceof Break){
+                    return null;
                 }
             }
             nueva_tabla = new Tabla(tabla);   

@@ -1,9 +1,10 @@
 import {Arbol} from '../AST/Arbol';
+import { Nodo } from '../AST/Nodo';
 import { Funcion } from '../Instrucciones/Funcion';
 import { Traducir } from './Traducir';
 class Desanidar{
 
-    contenido:Array<Object> = [];
+    contenido:Array<Nodo> = [];
     contador = 0;
     val_exp = "";
     desanidar(arbol: Arbol):string{
@@ -16,6 +17,7 @@ class Desanidar{
                 this.contenido.push(instruccion);
             }
         }
+        arbol.instrucciones = this.contenido;
         return new Traducir().traducir(this.contenido);
     }
 

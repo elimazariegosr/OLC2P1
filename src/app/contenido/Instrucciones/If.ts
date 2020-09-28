@@ -40,15 +40,21 @@ class If extends Nodo {
 
             for (let i = 0; i < this.lista_if.length; i++) {                
                 const cont = this.lista_if[i].ejecutar(nueva_tabla, arbol);
-                if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                if(cont instanceof Return){
                     return cont;
+                }
+                if(cont instanceof Continue || cont instanceof Break){
+                    return null;
                 }
             }
         } else {  
             for (let i = 0; i < this.lista_else.length; i++) {
                 const cont = this.lista_else[i].ejecutar(nueva_tabla, arbol);
-                if(cont instanceof Continue || cont instanceof Break || cont instanceof Return){
+                if(cont instanceof Return){
                     return cont;
+                }
+                if(cont instanceof Continue || cont instanceof Break){
+                    return null;
                 }
             }
         }
