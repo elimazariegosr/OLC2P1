@@ -20,10 +20,7 @@ class Ternario extends Nodo{
 
     ejecutar(tabla: Tabla, arbol: Arbol){
         let res: Nodo;
-        console.log("Cond");
-        console.log(this.condicion);
         res = this.condicion.ejecutar(tabla, arbol);
-        console.log(res);
         if (res instanceof Array) {
             return res;
         }

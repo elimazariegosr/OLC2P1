@@ -23,7 +23,6 @@ class Desanidar{
         let f_aux = new Funcion(nombre, func.parametros,[],func.tipo,func.linea, func.columna);
         for(let i = 0; i < func.contenido.length; i++){
             let inst = func.contenido[i];
-            console.log(nombre);
             if(inst instanceof Funcion){
                 this.recorrer_funcion(inst, nombre + "_" + inst.nombre);
             }else{

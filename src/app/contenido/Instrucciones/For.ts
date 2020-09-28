@@ -38,7 +38,6 @@ class For extends Nodo{
         do {
             nueva_tabla = new Tabla(nueva_tabla);
             res = this.exp2.ejecutar(nueva_tabla, arbol);
-            console.log(res);
             if (res instanceof Error) {
                 return res;
             }

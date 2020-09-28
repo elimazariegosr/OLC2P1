@@ -187,7 +187,6 @@ class GD_Arreglo extends Nodo{
         this.nombre  = nombre; 
         this.posicion = posicion;
         this.id = "ARRAY#_" + nombre;
-        console.log(posicion);
     }
     get_valor(tabla: Tabla, arbol: Arbol){
         let arreglo_aux = this.arreglo;
@@ -196,7 +195,6 @@ class GD_Arreglo extends Nodo{
         for (let i = 0; i < this.posicion.length; i++) {
             if(i== 0){tmp = arreglo_aux;}
             pos = this.posicion[i].ejecutar(tabla, arbol);
-            console.log("here");
             try{
                 if(i == this.posicion.length -1){
                     tmp = tmp[pos];
@@ -217,7 +215,6 @@ class GD_Arreglo extends Nodo{
                     tmp = tmp[pos];
                 }
             }catch(e){
-                console.log("here");
                 const error = new Errror('Semantico',
                 'Posicion incorrecta en el arreglo ' + this.nombre,
                 this.linea, this.columna);
