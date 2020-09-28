@@ -89,7 +89,7 @@ class Traducir{
         }else if(sent instanceof Type_object){
             cont = this.sent_type_obj(sent, tab);
         }else if(sent instanceof Set_type){
-            cont = this.sd_type_obj(sent, tab);
+            cont = this.sd_type_obj(sent, tab); 
         }
         return cont;
     }

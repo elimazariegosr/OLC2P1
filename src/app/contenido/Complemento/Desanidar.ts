@@ -4,7 +4,6 @@ import { Traducir } from './Traducir';
 class Desanidar{
 
     contenido:Array<Object> = [];
-    
     contador = 0;
     val_exp = "";
     desanidar(arbol: Arbol):string{
